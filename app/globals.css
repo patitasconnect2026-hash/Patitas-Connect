@@ -1,0 +1,196 @@
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+@theme inline {
+  --font-sans: var(--font-figtree), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+}
+
+@theme {
+  /* Marca (se mantienen los colores originales del brief) */
+  --color-brand: #ea580c;
+  --color-brand-50: #fff4ea;
+  --color-brand-100: #ffe4cc;
+  --color-brand-200: #fdc79a;
+  --color-brand-300: #fba561;
+  --color-brand-400: #f77f2c;
+  --color-brand-500: #f06a14;
+  --color-brand-600: #ea580c;
+  --color-brand-700: #c2410c;
+  --color-brand-800: #9a3412;
+  --color-brand-900: #7c2d12;
+  --color-ink: #0f172a;
+  /* Texto secundario: un solo gris con contraste >= 4,5:1 sobre crema, arena y blanco. Reemplaza text-ink/30 a /65. */
+  --color-ink-soft: #566073;
+
+  /* Papel cálido en lugar de gris frío: se siente hecho a mano */
+  --color-canvas: #fbf6ee;
+  --color-paper: #ffffff;
+  --color-sand: #f3eadb;
+  --color-sand-2: #e8dcc8;
+
+  /* Un solo verde para todo lo "verificado / seguro" */
+  --color-forest: #146c43;
+  --color-forest-50: #e6f3ec;
+  --color-forest-100: #cde8d9;
+  --color-sky: #0b6fa4;
+  --color-gold: #f5b301;
+
+  --shadow-card: 0 1px 0 rgb(15 23 42 / 0.04), 0 14px 28px -20px rgb(15 23 42 / 0.35);
+  --shadow-pop: 0 18px 40px -18px rgb(15 23 42 / 0.45);
+  --shadow-press: 0 3px 0 var(--color-brand-800);
+  --shadow-press-ink: 0 3px 0 #000;
+  --shadow-press-forest: 0 3px 0 #0b3d27;
+  --shadow-press-red: 0 3px 0 #7f1d1d;
+}
+
+html,
+body {
+  height: 100%;
+  background: #efe6d6;
+  color: var(--color-ink);
+  -webkit-tap-highlight-color: transparent;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  overscroll-behavior: none;
+}
+
+button {
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+
+.font-display {
+  font-family: var(--font-display);
+  font-variation-settings: "SOFT" 70, "WONK" 0;
+  letter-spacing: -0.015em;
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Botones "tactiles": se hunden al presionarlos */
+@utility btn-press {
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+  &:active:not(:disabled) {
+    transform: translateY(3px);
+    box-shadow: none;
+  }
+}
+
+/* Etiqueta pequeña sobre los titulares */
+@utility eyebrow {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* Puntitos del "escribiendo…" */
+@keyframes typing-bounce {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+.typing-dot {
+  animation: typing-bounce 1.1s infinite ease-in-out;
+}
+
+/* Brillo que recorre un elemento (estado "retenido") */
+@keyframes sheen {
+  from {
+    transform: translateX(-120%);
+  }
+  to {
+    transform: translateX(220%);
+  }
+}
+
+.sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 40%;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.35), transparent);
+  animation: sheen 2.6s infinite ease-in-out;
+}
+
+/* ---- Leaflet: ajustes para que el mapa combine con la app ---- */
+.leaflet-container {
+  font-family: var(--font-sans);
+  background: #efe9dd;
+}
+/* Mapa un poco más suave y cálido, para que combine con el papel crema de la app */
+.leaflet-tile-pane {
+  filter: saturate(0.7) sepia(0.14) contrast(0.96) brightness(1.04);
+}
+.leaflet-control-attribution {
+  font-size: 12px !important;
+  background: rgb(255 255 255 / 0.85) !important;
+}
+.leaflet-control-attribution a {
+  display: inline-block;
+  padding: 0.5rem 0.15rem;
+}
+.pin-smooth {
+  transition: transform 1.4s linear;
+}
+.leaflet-marker-icon.pin-smooth {
+  transition: transform 1.4s linear;
+}
+.leaflet-zoom-anim .leaflet-marker-icon.pin-smooth {
+  transition: transform 0.25s;
+}
+
+@keyframes pin-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+.pin-ping {
+  animation: pin-ping 1.8s ease-out infinite;
+}
+
+/* Nombre del distrito sobre el mapa */
+.leaflet-tooltip.district-label {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  color: #9a3412;
+  font: 800 12px var(--font-sans);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-shadow: 0 0 4px #fff, 0 0 4px #fff, 0 0 8px #fff;
+}
+.leaflet-tooltip.district-label::before {
+  display: none;
+}

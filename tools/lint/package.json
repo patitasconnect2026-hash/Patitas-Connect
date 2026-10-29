@@ -1,0 +1,10 @@
+{
+  "name": "patitas-connect-lint",
+  "private": true,
+  "description": "Solo para el lint. Usa TypeScript 6 porque typescript-eslint aún no soporta TypeScript 7. La app usa TypeScript 7 desde la carpeta principal.",
+  "devDependencies": {
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.4.0",
+    "typescript": "npm:@typescript/typescript6@^6.0.2"
+  }
+}
