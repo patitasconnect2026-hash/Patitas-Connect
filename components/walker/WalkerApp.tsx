@@ -17,6 +17,7 @@ import { cn } from '@/lib/utils'
 import { PawPattern } from '../Onboarding'
 import { PhoneFrame } from '../PhoneFrame'
 import { LogoMark } from '../ui/Logo'
+import { TextoRevuelto } from '../ui/Movimiento'
 import { WalkerHome } from './WalkerHome'
 import { debeVerLosPasos, postulacionCompleta, postulacionCompletaSinDniNiFoto, WalkerOnboarding } from './WalkerOnboarding'
 import { BorrarCuentaSheet } from '../acceso/BorrarCuentaSheet'
@@ -57,7 +58,9 @@ export function Welcome({ onStart, servidor = false }: { onStart: (opcion: Opcio
         <motion.div initial={{ scale: 0.5, opacity: 0, rotate: -8 }} animate={{ scale: 1, opacity: 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 200, damping: 13 }} className="mx-auto grid h-28 w-28 place-items-center rounded-full bg-brand-50 shadow-[0_18px_40px_-14px_rgba(0,0,0,.45)]">
           <LogoMark size={80} />
         </motion.div>
-        <p className="eyebrow mt-6 text-white">Para paseadores</p>
+        <p className="eyebrow mt-6 text-white">
+          <TextoRevuelto texto="Para paseadores" />
+        </p>
         <h1 className="font-display mt-1.5 text-[38px] font-bold leading-[1.02] tracking-tight">
           Gana paseando perros del <span className="italic text-brand-100">barrio</span>
         </h1>

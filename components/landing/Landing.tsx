@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { AnimatePresence, MotionConfig, motion, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion'
@@ -19,6 +19,7 @@ import {
   Siren,
   Smartphone,
   Wallet,
+  X,
 } from 'lucide-react'
 import { CONFIG, NOMBRE_APP, NOMBRE_CORTO, TEXTOS_PAGO, textoPlanLunesViernes } from '@/lib/config'
 import { DURATIONS } from '@/lib/data'
@@ -26,6 +27,7 @@ import { COMPROBACIONES, MAX_PERROS_POR_PASEO, REGLA_NUEVO, textoHastaComprobaci
 import { cn } from '@/lib/utils'
 import { Logo, PawMark } from '../ui/Logo'
 import { StoreBadges } from '../ui/StoreBadges'
+import { Abanico, Carrusel, FranjaGigante, PestanasSubrayadas, TextoCircular, TextoRevuelto } from '../ui/Movimiento'
 import { PawPattern } from '../Onboarding'
 
 /** Textos de la portada pública. Todo lo que se promete aquí existe en la app (ver la skill patitas-connect, sección 6). */
@@ -70,7 +72,10 @@ function Seccion({ id, className, children }: { id?: string; className?: string;
 function Titulo({ eyebrow, children, claro = false }: { eyebrow: string; children: React.ReactNode; claro?: boolean }) {
   return (
     <motion.div {...aparecer} className="max-w-2xl">
-      <p className={cn('eyebrow', claro ? 'text-brand-200' : 'text-brand-700')}>{eyebrow}</p>
+      <p className={cn('eyebrow inline-flex items-center gap-2', claro ? 'text-brand-200' : 'text-brand-700')}>
+        <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden />
+        <TextoRevuelto texto={eyebrow} />
+      </p>
       <h2 className={cn('font-display mt-3 text-[32px] font-bold leading-[1.05] text-balance md:text-[46px]', claro ? 'text-white' : 'text-ink')}>
         {children}
       </h2>
@@ -230,6 +235,8 @@ function Portada({ onEntrar }: { onEntrar: () => void }) {
         <div className="relative mx-auto aspect-square w-full max-w-[320px] sm:max-w-[460px] md:max-w-[520px]">
           <motion.div style={{ y: yCirculo }} className="absolute inset-[4%] overflow-hidden rounded-full bg-brand-600">
             <PawPattern id="portada-huellas" />
+            {/* Disco que gira despacio con el nombre y los distritos (como el disco de Spaidra). */}
+            <TextoCircular texto={`${NOMBRE_APP.toUpperCase()} · SAN ISIDRO · JESÚS MARÍA · `} className="absolute inset-0 text-brand-100" />
           </motion.div>
           <motion.div
             initial={{ scale: 0.85, opacity: 0 }}
@@ -487,10 +494,196 @@ function ComoFunciona() {
   )
 }
 
+/* ------------------------------------------------------------------ */
+/* Tranquilidad: tres paneles altos que se abren como artículo (como Geospace) */
+/* ------------------------------------------------------------------ */
+
+const HISTORIAS = [
+  {
+    id: 'fotos',
+    icon: Camera,
+    t: 'Fotos con hora y lugar',
+    corto: 'Ves a tu perro durante el paseo.',
+    fondo: 'bg-sand text-ink',
+    parrafos: [
+      'Durante el paseo, el paseador toma fotos con la cámara de la app. Cada foto guarda la hora y el lugar donde se tomó, así sabes cómo va el paseo.',
+      'Además, en el camino marca puntos de control. Tú los ves desde tu celular, sin tener que escribirle a nadie.',
+    ],
+  },
+  {
+    id: 'codigo',
+    icon: KeyRound,
+    t: 'Código de recojo',
+    corto: 'Tu perro sale solo con tu código.',
+    fondo: 'bg-brand-700 text-white',
+    parrafos: [
+      'Cuando el paseador llega a tu casa, le das un código de 4 dígitos que ves en tu app. Así el paseo empieza solo cuando tú entregas a tu perro.',
+      'Al volver, tocas «Recibí a tu perro» para confirmar que llegó bien. Si algo no está bien, lo reportas desde el mismo paseo.',
+    ],
+  },
+  {
+    id: 'pago',
+    icon: Wallet,
+    t: 'Pagas al terminar',
+    corto: `A ${NOMBRE_CORTO}, no al paseador.`,
+    fondo: 'bg-vino-900 text-white',
+    parrafos: [
+      `No pagas nada al reservar. Al terminar el paseo le pagas a ${NOMBRE_CORTO} con Yape, Plin o transferencia, y pagas solo el precio del paseo.`,
+      `${NOMBRE_CORTO} le paga al paseador después de confirmar tu pago. ${TEXTOS_PAGO.honestidad}`,
+    ],
+  },
+] as const
+
+function Articulo({ indice, onCerrar, onSiguiente }: { indice: number; onCerrar: () => void; onSiguiente: () => void }) {
+  const h = HISTORIAS[indice]
+  const cerrar = useRef<HTMLButtonElement>(null)
+  const caja = useRef<HTMLDivElement>(null)
+  const reducir = useReducedMotion()
+  const { scrollYProgress } = useScroll({ container: caja })
+  const x = useTransform(scrollYProgress, [0, 1], ['0%', reducir ? '0%' : '-35%'])
+
+  useEffect(() => {
+    cerrar.current?.focus()
+    const antes = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    const tecla = (e: KeyboardEvent) => e.key === 'Escape' && onCerrar()
+    window.addEventListener('keydown', tecla)
+    return () => {
+      document.body.style.overflow = antes
+      window.removeEventListener('keydown', tecla)
+    }
+  }, [onCerrar])
+
+  useEffect(() => {
+    caja.current?.scrollTo({ top: 0 })
+  }, [indice])
+
+  return (
+    <motion.div className="fixed inset-0 z-[70] flex" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+      {/* A la izquierda queda el panel elegido, como en Geospace. */}
+      <button type="button" aria-label="Cerrar" tabIndex={-1} onClick={onCerrar} className={cn('hidden flex-1 md:block', h.fondo)}>
+        <span className="grid h-full place-items-center">
+          <h.icon size={120} strokeWidth={1.2} className="opacity-25" aria-hidden />
+        </span>
+      </button>
+      <motion.div
+        ref={caja}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="articulo-titulo"
+        initial={{ x: '100%' }}
+        animate={{ x: 0 }}
+        exit={{ x: '100%' }}
+        transition={{ type: 'spring', stiffness: 260, damping: 32 }}
+        className="relative h-full w-full overflow-y-auto overflow-x-hidden bg-canvas md:w-[58%] md:shadow-[-30px_0_60px_-30px_rgba(20,8,9,.5)]"
+      >
+        <div className="sticky top-0 z-10 flex items-center justify-between bg-canvas/90 px-5 py-3 backdrop-blur md:px-10">
+          <p className="eyebrow inline-flex items-center gap-2 text-brand-700">
+            <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden /> 0{indice + 1} / 0{HISTORIAS.length}
+          </p>
+          <button
+            ref={cerrar}
+            type="button"
+            onClick={onCerrar}
+            aria-label="Cerrar"
+            className="grid h-12 w-12 place-items-center rounded-full bg-ink text-white"
+          >
+            <X size={22} aria-hidden />
+          </button>
+        </div>
+        <motion.p
+          aria-hidden
+          style={{ x }}
+          className="font-display mt-6 whitespace-nowrap px-5 text-[64px] font-bold uppercase leading-none text-brand-600 md:px-10 md:text-[110px]"
+        >
+          {h.t}
+        </motion.p>
+        <article className="px-5 pb-16 md:px-10">
+          <h2 id="articulo-titulo" className="font-display mt-8 text-[30px] font-bold leading-tight text-ink md:text-[40px]">
+            {h.t}
+          </h2>
+          <p className="mt-6 text-[18px] leading-relaxed text-ink first-letter:float-left first-letter:mr-3 first-letter:font-display first-letter:text-[68px] first-letter:font-bold first-letter:leading-[0.8] first-letter:text-brand-700">
+            {h.parrafos[0]}
+          </p>
+          <div className={cn('my-10 grid h-56 place-items-center rounded-[2rem] md:h-72', h.fondo)} aria-hidden>
+            <h.icon size={72} strokeWidth={1.4} />
+          </div>
+          <p className="text-[18px] leading-relaxed text-ink-soft">{h.parrafos[1]}</p>
+          {/* «Siguiente», con el botón redondo de flecha (como «Read full article» en Geospace). */}
+          <button
+            type="button"
+            onClick={onSiguiente}
+            className="group mt-14 flex w-full items-center justify-between gap-4 border-t border-ink/10 pt-6 text-left"
+          >
+            <span>
+              <span className="eyebrow block text-ink-soft">Siguiente</span>
+              <span className="font-display mt-1 block text-[22px] font-bold text-ink md:text-[26px]">{HISTORIAS[(indice + 1) % HISTORIAS.length].t}</span>
+            </span>
+            <span className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-brand-700 text-white transition-transform group-hover:translate-x-1">
+              <ArrowRight size={22} aria-hidden />
+            </span>
+          </button>
+        </article>
+      </motion.div>
+    </motion.div>
+  )
+}
+
+function Tranquilidad() {
+  const [abierto, setAbierto] = useState<number | null>(null)
+  const origen = useRef<HTMLButtonElement | null>(null)
+  const cerrar = useCallback(() => {
+    setAbierto(null)
+    origen.current?.focus()
+  }, [])
+  return (
+    <section id="tranquilidad" className="scroll-mt-20 bg-canvas pt-16 md:pt-24">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <Titulo eyebrow="Tu tranquilidad">Tres cosas que cuidan cada paseo.</Titulo>
+      </div>
+      <ul className="mt-10 flex flex-col md:h-[78vh] md:max-h-[720px] md:min-h-[520px] md:flex-row">
+        {HISTORIAS.map((h, i) => (
+          <motion.li
+            key={h.id}
+            className="relative flex min-h-[260px] md:min-h-0 md:flex-1"
+            whileHover={{ flexGrow: 1.5 }}
+            transition={{ type: 'spring', stiffness: 200, damping: 30 }}
+          >
+            <button
+              type="button"
+              onClick={(e) => {
+                origen.current = e.currentTarget
+                setAbierto(i)
+              }}
+              className={cn('group flex w-full flex-col justify-between p-6 text-left md:p-10', h.fondo)}
+            >
+              <span className="font-display text-[15px] font-bold opacity-80">0{i + 1}</span>
+              <span>
+                <h.icon size={40} strokeWidth={1.6} className="transition-transform duration-500 group-hover:-translate-y-2" aria-hidden />
+                <span className="font-display mt-5 block text-[28px] font-bold uppercase leading-[1.02] md:text-[34px]">{h.t}</span>
+                <span className="mt-2 block text-[16px] font-semibold opacity-85">{h.corto}</span>
+                <span className="mt-6 inline-flex items-center gap-3 text-[15px] font-extrabold">
+                  <span className="grid h-11 w-11 place-items-center rounded-full ring-1 ring-current transition group-hover:bg-white/15">
+                    <ArrowRight size={18} aria-hidden />
+                  </span>
+                  Leer más
+                </span>
+              </span>
+            </button>
+          </motion.li>
+        ))}
+      </ul>
+      <AnimatePresence>
+        {abierto !== null && <Articulo key="articulo" indice={abierto} onCerrar={cerrar} onSiguiente={() => setAbierto((abierto + 1) % HISTORIAS.length)} />}
+      </AnimatePresence>
+    </section>
+  )
+}
+
 function Confianza() {
   return (
     <Seccion id="confianza" className="relative overflow-hidden bg-vino-800 text-white">
-      <div className="grid gap-12 lg:grid-cols-[1fr_1.15fr] lg:gap-16">
+      <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
         <div>
           <Titulo eyebrow="Confianza" claro>
             {textoHastaComprobaciones()} antes de pasear.
@@ -498,52 +691,55 @@ function Confianza() {
           <motion.p {...aparecer} className="mt-5 max-w-lg text-[17px] leading-relaxed text-white/80">
             Cada paseador muestra solo las comprobaciones que el equipo ya hizo. Si una no está marcada, no aparece.
           </motion.p>
-          <motion.ul {...aparecer} className="mt-8 space-y-4">
-            {[
-              {
-                icon: GraduationCap,
-                t: 'Primeros paseos acompañados',
-                d: `En sus primeros ${REGLA_NUEVO.paseos} paseos lleva máximo ${REGLA_NUEVO.maxPerros} perros; después, ${MAX_PERROS_POR_PASEO}.`,
-              },
-              {
-                icon: PawMarkIcon,
-                t: 'Perros del mismo tamaño',
-                d: 'Pequeños, medianos y grandes nunca se mezclan en un grupo.',
-              },
-              {
-                icon: Siren,
-                t: 'Si algo pasa',
-                d: 'Botón de ayuda para llamar a Policía, Bomberos o SAMU, y «Reportar problema» para el equipo.',
-              },
-            ].map((r) => (
-              <li key={r.t} className="flex items-start gap-4">
-                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-brand-700 text-white">
-                  <r.icon size={20} aria-hidden />
-                </span>
-                <span>
-                  <span className="block text-[17px] font-extrabold">{r.t}</span>
-                  <span className="block text-[15px] text-white/75">{r.d}</span>
-                </span>
+        </div>
+        <motion.ul {...aparecer} className="space-y-4 lg:pt-10">
+          {[
+            {
+              icon: GraduationCap,
+              t: 'Primeros paseos acompañados',
+              d: `En sus primeros ${REGLA_NUEVO.paseos} paseos lleva máximo ${REGLA_NUEVO.maxPerros} perros; después, ${MAX_PERROS_POR_PASEO}.`,
+            },
+            {
+              icon: PawMarkIcon,
+              t: 'Perros del mismo tamaño',
+              d: 'Pequeños, medianos y grandes nunca se mezclan en un grupo.',
+            },
+            {
+              icon: Siren,
+              t: 'Si algo pasa',
+              d: 'Botón de ayuda para llamar a Policía, Bomberos o SAMU, y «Reportar problema» para el equipo.',
+            },
+          ].map((r) => (
+            <li key={r.t} className="flex items-start gap-4">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-brand-700 text-white">
+                <r.icon size={20} aria-hidden />
+              </span>
+              <span>
+                <span className="block text-[17px] font-extrabold">{r.t}</span>
+                <span className="block text-[15px] text-white/75">{r.d}</span>
+              </span>
+            </li>
+          ))}
+        </motion.ul>
+        <motion.div {...aparecer} className="min-w-0 lg:col-span-2">
+          {/* Las comprobaciones en carrusel, con flechas y barra de avance (como Good Dog). */}
+          <Carrusel etiqueta="Comprobaciones de cada paseador" claro>
+            {COMPROBACIONES.map((c, i) => (
+              <li key={c.id} className="w-[82%] shrink-0 snap-start rounded-3xl bg-white/[0.06] p-6 ring-1 ring-white/10 sm:w-[320px]">
+                <div className="flex items-center justify-between">
+                  <span className="grid h-10 w-10 place-items-center rounded-full bg-forest text-white">
+                    <Check size={19} strokeWidth={3} aria-hidden />
+                  </span>
+                  <span className="font-display text-[15px] font-bold text-brand-200">
+                    {String(i + 1).padStart(2, '0')} / {String(COMPROBACIONES.length).padStart(2, '0')}
+                  </span>
+                </div>
+                <h3 className="mt-5 text-[18px] font-extrabold">{c.titulo}</h3>
+                <p className="mt-1.5 text-[15px] leading-relaxed text-white/75">{c.apoyo}</p>
               </li>
             ))}
-          </motion.ul>
-        </div>
-        <ul className="grid gap-4 sm:grid-cols-2">
-          {COMPROBACIONES.map((c, i) => (
-            <motion.li
-              key={c.id}
-              {...aparecer}
-              transition={{ duration: 0.3, delay: i * 0.05 }}
-              className="rounded-3xl bg-white/[0.06] p-5 ring-1 ring-white/10"
-            >
-              <span className="grid h-9 w-9 place-items-center rounded-full bg-forest text-white">
-                <Check size={18} strokeWidth={3} aria-hidden />
-              </span>
-              <h3 className="mt-4 text-[17px] font-extrabold">{c.titulo}</h3>
-              <p className="mt-1 text-[15px] leading-relaxed text-white/75">{c.apoyo}</p>
-            </motion.li>
-          ))}
-        </ul>
+          </Carrusel>
+        </motion.div>
       </div>
     </Seccion>
   )
@@ -599,36 +795,50 @@ function Precios({ onEntrar }: { onEntrar: () => void }) {
   )
 }
 
+const ZONAS = {
+  'san-isidro': { t: 'San Isidro', d: 'Paseadores que viven o estudian en el distrito, cerca de sus parques.' },
+  'jesus-maria': { t: 'Jesús María', d: 'Paseadores vecinos, con parques cerca de tu casa.' },
+} as const
+type Zona = keyof typeof ZONAS
+
 function Cobertura() {
+  const [zona, setZona] = useState<Zona>('san-isidro')
+  const z = ZONAS[zona]
   return (
-    <Seccion id="cobertura" className="bg-paper">
-      <Titulo eyebrow="Dónde estamos">Empezamos por dos distritos, y bien hecho.</Titulo>
-      <div className="mt-12 grid gap-5 md:grid-cols-2">
-        {[
-          {
-            n: 'San Isidro',
-            d: 'Paseadores que viven o estudian en el distrito, cerca de sus parques.',
-          },
-          {
-            n: 'Jesús María',
-            d: 'Paseadores vecinos, con parques cerca de tu casa.',
-          },
-        ].map((z, i) => (
-          <motion.div
-            key={z.n}
-            {...aparecer}
-            transition={{ duration: 0.3, delay: i * 0.08 }}
-            className="relative overflow-hidden rounded-[2rem] bg-sand p-8 md:p-10"
-          >
-            <PawMark className="absolute -right-6 -top-6 h-40 w-40 rotate-12 text-sand-2" />
-            <MapPin size={28} className="relative text-brand-700" aria-hidden />
-            <h3 className="font-display relative mt-4 text-[34px] font-bold leading-none text-ink md:text-[42px]">{z.n}</h3>
-            <p className="relative mt-3 max-w-sm text-[16px] leading-relaxed text-ink-soft">{z.d}</p>
-          </motion.div>
-        ))}
+    <section id="cobertura" className="scroll-mt-20 overflow-hidden bg-paper py-16 md:py-24">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <Titulo eyebrow="Dónde estamos">Empezamos por dos distritos, y bien hecho.</Titulo>
       </div>
-      <p className="mt-6 text-[15px] text-ink-soft">¿Vives en otro distrito? Pronto llegamos.</p>
-    </Seccion>
+      {/* Los distritos en letras gigantes, que se deslizan al bajar (como Geospace). */}
+      <FranjaGigante texto="San Isidro · Jesús María · San Isidro ·" className="mt-8 text-brand-600/90" />
+      <div className="mx-auto mt-8 max-w-6xl px-4 sm:px-6">
+        <PestanasSubrayadas
+          id="zonas"
+          etiqueta="Distritos"
+          valor={zona}
+          onCambio={setZona}
+          opciones={(Object.keys(ZONAS) as Zona[]).map((v) => ({ v, t: ZONAS[v].t }))}
+        />
+        <div id="zonas-panel" role="tabpanel" aria-labelledby={`zonas-tab-${zona}`} className="mt-8">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={zona}
+              initial={{ opacity: 0, x: 24 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -24 }}
+              transition={{ duration: 0.3 }}
+              className="relative overflow-hidden rounded-[2rem] bg-sand p-8 md:p-10"
+            >
+              <PawMark className="absolute -right-6 -top-6 h-40 w-40 rotate-12 text-sand-2" />
+              <MapPin size={28} className="relative text-brand-700" aria-hidden />
+              <h3 className="font-display relative mt-4 text-[34px] font-bold leading-none text-ink md:text-[42px]">{z.t}</h3>
+              <p className="relative mt-3 max-w-sm text-[16px] leading-relaxed text-ink-soft">{z.d}</p>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+        <p className="mt-6 text-[15px] text-ink-soft">¿Vives en otro distrito? Pronto llegamos.</p>
+      </div>
+    </section>
   )
 }
 
@@ -636,8 +846,41 @@ function Cobertura() {
 /* La app: el ÚNICO lugar con Google Play y App Store */
 /* ------------------------------------------------------------------ */
 
+/** Las fichas del abanico: lo que hace la app, sin pantallas inventadas. */
+const FICHAS_APP = [
+  {
+    id: 'icono',
+    contenido: (
+      <div className="grid h-[300px] place-items-center rounded-[2.4rem] bg-brand-50 shadow-[0_30px_60px_-20px_rgba(91,34,41,.55)] ring-1 ring-vino/10">
+        <div className="text-center">
+          <Image src="/marca/logo-mark.png" alt="" width={482} height={512} className="mx-auto h-32 w-auto" />
+          <p className="font-display mt-4 text-[20px] font-bold uppercase text-brand-700">{NOMBRE_CORTO}</p>
+          <p className="font-display text-[13px] font-bold uppercase tracking-[0.3em] text-vino">{NOMBRE_APP.split(' ').slice(1).join(' ')}</p>
+        </div>
+      </div>
+    ),
+  },
+  ...[
+    { id: 'foto', icon: Camera, t: 'Foto del paseo', d: 'Con hora y lugar', fondo: 'bg-brand-700' },
+    { id: 'codigo', icon: KeyRound, t: 'Código de recojo', d: 'Lo das tú al entregar', fondo: 'bg-vino-800' },
+    { id: 'pago', icon: Wallet, t: 'Pagas al terminar', d: `A ${NOMBRE_CORTO}, no al paseador`, fondo: 'bg-ink' },
+  ].map((c) => ({
+    id: c.id,
+    contenido: (
+      <div className={cn('flex h-[300px] flex-col justify-between rounded-[2.4rem] p-7 text-white shadow-[0_30px_60px_-20px_rgba(20,8,9,.55)]', c.fondo)}>
+        <span className="grid h-14 w-14 place-items-center rounded-full bg-white/15">
+          <c.icon size={26} aria-hidden />
+        </span>
+        <span>
+          <span className="font-display block text-[24px] font-bold uppercase leading-tight">{c.t}</span>
+          <span className="mt-1 block text-[15px] font-semibold text-white/80">{c.d}</span>
+        </span>
+      </div>
+    ),
+  })),
+]
+
 function App() {
-  const reducir = useReducedMotion()
   return (
     <Seccion id="app" className="relative overflow-hidden bg-sand">
       <div className="grid items-center gap-12 md:grid-cols-[1.1fr_1fr]">
@@ -653,29 +896,8 @@ function App() {
             <Smartphone size={17} aria-hidden /> Todavía no están en las tiendas: avisaremos cuando salgan.
           </motion.p>
         </div>
-        {/* Ícono de la app flotando, con ondas suaves detrás. */}
-        <div className="relative mx-auto grid aspect-square w-full max-w-[300px] place-items-center" aria-hidden>
-          {[0, 1, 2].map((i) => (
-            <motion.span
-              key={i}
-              className="absolute inset-0 rounded-[3rem] border-2 border-brand-300"
-              animate={reducir ? undefined : { scale: [0.7, 1.15], opacity: [0.7, 0] }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                delay: i,
-                ease: 'easeOut',
-              }}
-            />
-          ))}
-          <motion.div
-            animate={reducir ? undefined : { y: [0, -10, 0] }}
-            transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-            className="relative grid h-44 w-44 place-items-center rounded-[2.6rem] bg-brand-50 shadow-[0_30px_60px_-20px_rgba(91,34,41,.55)] ring-1 ring-vino/10"
-          >
-            <Image src="/marca/logo-mark.png" alt="" width={482} height={512} className="h-32 w-auto" />
-          </motion.div>
-        </div>
+        {/* Fichas en abanico que pasan solas (como el carrusel de Spaidra). */}
+        <Abanico fichas={FICHAS_APP} etiqueta="Lo que hace la app" />
       </div>
     </Seccion>
   )
@@ -777,6 +999,32 @@ function Preguntas() {
   )
 }
 
+/** El nombre en grande al final, con las letras subiendo una por una (como el pie de TAG Heuer). */
+function MarcaGigante() {
+  const letras = NOMBRE_APP.toUpperCase().split('')
+  return (
+    <motion.p
+      aria-hidden
+      initial="oculto"
+      whileInView="visible"
+      viewport={{ once: true, margin: '-20px' }}
+      transition={{ staggerChildren: 0.035 }}
+      className="font-display mx-auto mt-14 flex max-w-6xl justify-between overflow-hidden text-[8.4vw] font-bold leading-[1.1] text-brand-200/90 lg:text-[104px]"
+    >
+      {letras.map((l, i) => (
+        <motion.span
+          key={i}
+          variants={{ oculto: { y: '110%' }, visible: { y: 0 } }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="inline-block"
+        >
+          {l === ' ' ? '\u00a0' : l}
+        </motion.span>
+      ))}
+    </motion.p>
+  )
+}
+
 function Pie({ onEntrar }: { onEntrar: () => void }) {
   return (
     <footer className="bg-vino-900 px-4 pb-[max(2.5rem,env(safe-area-inset-bottom))] pt-14 text-white sm:px-6">
@@ -821,7 +1069,8 @@ function Pie({ onEntrar }: { onEntrar: () => void }) {
           </ul>
         </nav>
       </div>
-      <div className="mx-auto mt-12 flex max-w-6xl flex-col gap-2 border-t border-white/10 pt-6 text-[13px] text-white/70 sm:flex-row sm:justify-between">
+      <MarcaGigante />
+      <div className="mx-auto mt-8 flex max-w-6xl flex-col gap-2 border-t border-white/10 pt-6 text-[13px] text-white/70 sm:flex-row sm:justify-between">
         <p>© {NOMBRE_APP}. Proyecto piloto de estudiantes.</p>
         <p>San Isidro · Jesús María · Lima, Perú</p>
       </div>
@@ -867,6 +1116,7 @@ export function Landing({ onEntrar }: { onEntrar: () => void }) {
           <Marquesina />
           <Caminos onEntrar={onEntrar} />
           <ComoFunciona />
+          <Tranquilidad />
           <Confianza />
           <Precios onEntrar={onEntrar} />
           <Cobertura />

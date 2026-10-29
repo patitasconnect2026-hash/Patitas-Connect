@@ -23,6 +23,7 @@ import { DogForm } from './DogForm'
 import { TermsBlocks } from './TermsBlocks'
 import { DogAvatar } from './ui/Dog'
 import { Logo, LogoMark, PawMark } from './ui/Logo'
+import { TextoRevuelto } from './ui/Movimiento'
 
 const DEMO_CODE = '482913'
 const TOTAL_STEPS = 6
@@ -241,7 +242,7 @@ export function Onboarding({
             transition={{ delay: 0.5 }}
             className="font-display mt-7 text-[34px] font-bold leading-[1] tracking-tight min-[400px]:text-[42px]"
           >
-            <span className="block uppercase">{partesNombre()[0]}</span>
+            <TextoRevuelto texto={partesNombre()[0].toUpperCase()} className="block" />
             <span className="mt-1.5 block text-[0.42em] uppercase tracking-[0.34em] text-brand-100">{partesNombre()[1]}</span>
           </motion.h1>
           <motion.p initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.65 }} className="mt-3 max-w-[300px] text-[16px] leading-relaxed text-white">
