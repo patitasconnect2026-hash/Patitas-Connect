@@ -50,6 +50,7 @@ import { PantallaEspera } from './acceso/PantallaEspera'
 import { TEXTO_PANTALLAS } from './acceso/FormularioAcceso'
 import { useAccesoApp } from './acceso/useAccesoApp'
 import { PhoneFrame } from './PhoneFrame'
+import { Landing } from './landing/Landing'
 import { ProfileView } from './ProfileView'
 import { ReviewsSheet } from './ReviewsSheet'
 import { SafetyView } from './SafetyView'
@@ -205,6 +206,8 @@ export function PatitasApp() {
   /** «Pedir paseo»: la familia dice cuánto pagaría y los paseadores de su zona responden. */
   const pedidos = usePedidoDeLaFamilia(acceso.usuarioId, dogs, WALKERS)
   const [pedirOpen, setPedirOpen] = useState(false)
+  /** La persona tocó «Entrar» en la portada pública: se muestra la app (alta o inicio de sesión). */
+  const [verApp, setVerApp] = useState(false)
   const respuestasNuevas = pedidos.pedido && pedidos.activo ? pedidos.pedido.ofertas.filter((o) => o.estado === 'enviada') : []
   useAvisoDeNuevos(respuestasNuevas.map((o) => o.id))
 
@@ -856,6 +859,12 @@ export function PatitasApp() {
   }
   // Local: como siempre (sin cuenta, portada). Con servidor: ver `debeMostrarOnboarding` (lib/servidor/destino.ts).
   const mostrarOnboarding = debeMostrarOnboarding({ vista: modoApp, hayCuenta: !!account, cuentaEsDeEjemplo: !!account && esCuentaDeEjemplo(account) })
+  // Quien llega sin cuenta ve primero la portada pública (la web de la marca). «Entrar» abre el alta o el inicio de sesión.
+  // Si llegó por el enlace del correo, va directo a entrar.
+  const desdePortada = mostrarOnboarding && (modoApp === 'local' || modoApp === 'entrada') && !acceso.llegoPorEnlace
+  if (store && desdePortada && !verApp) {
+    return <Landing onEntrar={() => setVerApp(true)} />
+  }
 
   return (
     <PhoneFrame>
@@ -1101,6 +1110,7 @@ export function PatitasApp() {
                     key={modoApp === 'continuar' ? 'onboarding-completar' : 'onboarding'}
                     initialReferral={refCode}
                     onFinish={finishOnboarding}
+                    onVolverPortada={desdePortada ? () => setVerApp(false) : undefined}
                     servidor={
                       modoApp === 'local'
                         ? undefined

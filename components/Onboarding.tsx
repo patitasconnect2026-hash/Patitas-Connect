@@ -23,7 +23,7 @@ import { DogForm } from './DogForm'
 import { TermsBlocks } from './TermsBlocks'
 import { ChasquiHead } from './ui/Chasqui'
 import { DogAvatar } from './ui/Dog'
-import { Logo, PawMark } from './ui/Logo'
+import { Logo, LogoMark, PawMark } from './ui/Logo'
 
 const DEMO_CODE = '482913'
 const TOTAL_STEPS = 6
@@ -96,16 +96,19 @@ export function Onboarding({
   initialReferral = '',
   onFinish,
   servidor,
+  onVolverPortada,
 }: {
   initialReferral?: string
   onFinish: (account: Account, dog: Dog | null) => void
   servidor?: OnboardingServidor
+  /** Se llegó desde la portada pública («Entrar»): se salta la bienvenida y «Atrás» vuelve a la portada. */
+  onVolverPortada?: () => void
 }) {
   const completar = servidor?.completar ?? null
   // En «completar» ya se tienen el celular y el nombre: se salta el celular y el código (pasos 1 y 2).
   const base = completar ? 2 : 0
-  const [step, setStep] = useState(completar ? 3 : 0)
-  const [verAcceso, setVerAcceso] = useState(() => !!servidor?.aviso)
+  const [step, setStep] = useState(completar ? 3 : onVolverPortada && !servidor ? 1 : 0)
+  const [verAcceso, setVerAcceso] = useState(() => !!servidor?.aviso || !!onVolverPortada)
   const [phone, setPhone] = useState(completar?.cuenta.celular ?? '')
   const [code, setCode] = useState('')
   const [verifying, setVerifying] = useState(false)
@@ -200,7 +203,10 @@ export function Onboarding({
     onFinish(account, withDog && dogOk ? { ...dog, name: dog.name.trim() } : null)
   }
 
-  const back = () => setStep((s) => Math.max(completar ? 3 : 0, s - 1))
+  const back = () => {
+    if (step === 1 && onVolverPortada) onVolverPortada()
+    else setStep((s) => Math.max(completar ? 3 : 0, s - 1))
+  }
   const paso = (n: number) => `Paso ${n - base} de ${TOTAL_STEPS - base}`
   const slide = { initial: { opacity: 0, x: 28 }, animate: { opacity: 1, x: 0 }, exit: { opacity: 0, x: -28 }, transition: { duration: 0.22 } }
   const disabledBtn = 'disabled:bg-ink/15 disabled:text-ink-soft disabled:shadow-none'
@@ -209,7 +215,7 @@ export function Onboarding({
   if (step === 0 && servidor && verAcceso) {
     return (
       <div className="absolute inset-0 z-[80] flex flex-col bg-canvas">
-        <PantallaEntrada cliente={servidor.cliente} onListo={servidor.onListo} onVolver={() => setVerAcceso(false)} aviso={servidor.aviso} />
+        <PantallaEntrada cliente={servidor.cliente} onListo={servidor.onListo} onVolver={onVolverPortada ?? (() => setVerAcceso(false))} aviso={servidor.aviso} />
       </div>
     )
   }
@@ -227,7 +233,7 @@ export function Onboarding({
             className="grid h-36 w-36 place-items-center rounded-full bg-brand-50 shadow-[0_18px_40px_-14px_rgba(0,0,0,.45)]"
           >
             <motion.div animate={{ y: [0, -3, 0] }} transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}>
-              <ChasquiHead className="h-28 w-28" />
+              <LogoMark size={104} />
             </motion.div>
           </motion.div>
           <motion.h1
