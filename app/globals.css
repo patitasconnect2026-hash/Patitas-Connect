@@ -207,3 +207,23 @@ button:disabled {
 .leaflet-tooltip.district-label::before {
   display: none;
 }
+
+/* Marquesina de la portada: dos copias seguidas que se desplazan la mitad del ancho. */
+@keyframes marquesina {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.marquesina {
+  animation: marquesina 40s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquesina {
+    animation: none;
+  }
+}

@@ -4,7 +4,7 @@ import { etiquetaDeExamen } from '@/lib/respuestasEscritas'
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ArrowRight, BadgeCheck, Check, Clock, LogOut, ShieldCheck, Trash2, Video, Wallet } from 'lucide-react'
+import { ArrowLeft, ArrowRight, BadgeCheck, Check, Clock, LogOut, ShieldCheck, Trash2, Video, Wallet } from 'lucide-react'
 import { CONFIG, NOMBRE_CORTO, textoComision } from '@/lib/config'
 import { casillasMarcadas, COMPROBACIONES } from '@/lib/verificacion'
 import { WALKERS } from '@/lib/data'
@@ -16,7 +16,6 @@ import { appFromWalker, estadoVisible, type WalkerApplication } from '@/lib/walk
 import { cn } from '@/lib/utils'
 import { PawPattern } from '../Onboarding'
 import { PhoneFrame } from '../PhoneFrame'
-import { ChasquiHead } from '../ui/Chasqui'
 import { LogoMark } from '../ui/Logo'
 import { WalkerHome } from './WalkerHome'
 import { debeVerLosPasos, postulacionCompleta, postulacionCompletaSinDniNiFoto, WalkerOnboarding } from './WalkerOnboarding'
@@ -47,9 +46,16 @@ export function Welcome({ onStart, servidor = false }: { onStart: (opcion: Opcio
   return (
     <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-brand-700 text-white">
       <PawPattern id="wk-paws" />
+      <Link
+        href="/"
+        aria-label="Volver al inicio"
+        className="absolute left-4 top-[max(1rem,env(safe-area-inset-top))] z-10 grid h-11 w-11 place-items-center rounded-full bg-white/15 text-white transition active:scale-95"
+      >
+        <ArrowLeft size={20} aria-hidden />
+      </Link>
       <div className="relative min-h-0 flex-1 overflow-y-auto px-7 pb-4 pt-[max(2rem,env(safe-area-inset-top))] text-center">
         <motion.div initial={{ scale: 0.5, opacity: 0, rotate: -8 }} animate={{ scale: 1, opacity: 1, rotate: 0 }} transition={{ type: 'spring', stiffness: 200, damping: 13 }} className="mx-auto grid h-28 w-28 place-items-center rounded-full bg-brand-50 shadow-[0_18px_40px_-14px_rgba(0,0,0,.45)]">
-          <ChasquiHead className="h-[88px] w-[88px]" />
+          <LogoMark size={80} />
         </motion.div>
         <p className="eyebrow mt-6 text-white">Para paseadores</p>
         <h1 className="font-display mt-1.5 text-[38px] font-bold leading-[1.02] tracking-tight">
@@ -96,7 +102,7 @@ export function Welcome({ onStart, servidor = false }: { onStart: (opcion: Opcio
           </p>
         )}
         <Link href="/" className="flex min-h-11 items-center justify-center text-center text-[14px] font-extrabold text-white underline decoration-brand-200/60 underline-offset-4">
-          Soy cliente: volver a la app
+          Tengo un perro: volver al inicio
         </Link>
       </div>
     </div>
@@ -132,7 +138,7 @@ export function Status({
       <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-6 pt-[max(1.5rem,env(safe-area-inset-top))]">
         <div className="flex flex-col items-center text-center">
           <div className="grid h-24 w-24 place-items-center rounded-full bg-brand-100">
-            <ChasquiHead className="h-20 w-20" />
+            <LogoMark size={68} />
           </div>
           <p className="eyebrow mt-5 text-brand-700">{rejected ? 'Resultado' : 'En revisión'}</p>
           <h1 className="font-display text-[34px] font-bold leading-[1.05] text-ink">{rejected ? 'Por ahora no podemos aprobarte' : `¡Gracias, ${app.person.firstName}!`}</h1>

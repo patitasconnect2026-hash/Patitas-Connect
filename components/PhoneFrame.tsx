@@ -1,17 +1,22 @@
 'use client'
 
 import { MotionConfig } from 'framer-motion'
-import { MapPin, ShieldCheck, Wallet } from 'lucide-react'
+import Link from 'next/link'
+import { ArrowLeft, MapPin, ShieldCheck, Wallet } from 'lucide-react'
 import { NOMBRE_CORTO, TEXTOS_PAGO } from '@/lib/config'
 import { resumenComprobaciones, textoHastaComprobaciones } from '@/lib/verificacion'
 import { Logo } from './ui/Logo'
-import { StoreBadges } from './ui/StoreBadges'
 
 /** Panel que se ve al costado del teléfono en pantallas grandes (para presentaciones). */
 function DesktopPitch({ walker }: { walker: boolean }) {
   return (
     <aside className="hidden max-w-sm lg:block">
-      <Logo size={48} />
+      <Link href="/" className="mb-8 inline-flex min-h-11 items-center gap-2 rounded-full bg-paper/70 px-4 text-[15px] font-extrabold text-ink ring-1 ring-ink/10 transition hover:bg-paper">
+        <ArrowLeft size={18} aria-hidden /> Volver al inicio
+      </Link>
+      <div>
+        <Logo size={48} />
+      </div>
       <h2 className="font-display mt-9 text-[46px] font-bold leading-[1.02] tracking-tight text-ink text-balance">
         {walker ? (
           <>
@@ -45,8 +50,6 @@ function DesktopPitch({ walker }: { walker: boolean }) {
           </li>
         ))}
       </ul>
-      <p className="mt-9 text-[14px] font-bold text-ink">Pronto también como app para tu celular:</p>
-      <StoreBadges className="mt-3" />
     </aside>
   )
 }

@@ -28,7 +28,7 @@ describe('portada del paseador con servidor', () => {
   })
   it('volver a la app de clientes sigue (ya no hay botón de demostración)', () => {
     expect(h).not.toContain('Entrar como paseador de demostración')
-    expect(h).toContain('Soy cliente: volver a la app')
+    expect(h).toContain('Tengo un perro: volver al inicio')
   })
   it('los textos son cortos', () => {
     expect(palabras(TEXTO_PORTADA_PASEADOR.entrar)).toBeLessThanOrEqual(5)

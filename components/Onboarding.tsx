@@ -21,7 +21,6 @@ import { PantallaEntrada } from './acceso/PantallaEntrada'
 import { CasaSheet, ResultadoZona } from './CasaSheet'
 import { DogForm } from './DogForm'
 import { TermsBlocks } from './TermsBlocks'
-import { ChasquiHead } from './ui/Chasqui'
 import { DogAvatar } from './ui/Dog'
 import { Logo, LogoMark, PawMark } from './ui/Logo'
 
@@ -515,7 +514,7 @@ export function Onboarding({
                   transition={{ type: 'spring', stiffness: 220, damping: 14 }}
                   className="grid h-32 w-32 place-items-center overflow-hidden rounded-full bg-brand-100"
                 >
-                  {dogOk && dog.photo ? <DogAvatar dog={dog} className="h-full w-full rounded-full" /> : <ChasquiHead className="h-28 w-28" />}
+                  {dogOk && dog.photo ? <DogAvatar dog={dog} className="h-full w-full rounded-full" /> : <LogoMark size={96} />}
                 </motion.div>
               </div>
               <h2 className="font-display mt-7 text-[36px] font-bold leading-[1.03] text-ink">¡Hola, {firstName.trim()}!</h2>
