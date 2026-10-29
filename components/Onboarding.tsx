@@ -250,7 +250,7 @@ export function Onboarding({
             {[
               { icon: BadgeCheck, t: `Paseadores con ${textoHastaComprobaciones().toLowerCase()}` },
               { icon: Wallet, t: `Pagas a ${NOMBRE_CORTO}, no al paseador` },
-              { icon: MapPin, t: 'Fotos y puntos de control (demostración)' },
+              { icon: MapPin, t: 'Fotos y puntos de control' },
             ].map((b) => (
               <li key={b.t} className="flex items-center gap-2.5 text-[14px] font-bold">
                 <b.icon size={18} className="shrink-0" /> {b.t}

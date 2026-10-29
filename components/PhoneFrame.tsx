@@ -5,6 +5,7 @@ import { MapPin, ShieldCheck, Wallet } from 'lucide-react'
 import { NOMBRE_CORTO, TEXTOS_PAGO } from '@/lib/config'
 import { resumenComprobaciones, textoHastaComprobaciones } from '@/lib/verificacion'
 import { Logo } from './ui/Logo'
+import { StoreBadges } from './ui/StoreBadges'
 
 /** Panel que se ve al costado del teléfono en pantallas grandes (para presentaciones). */
 function DesktopPitch({ walker }: { walker: boolean }) {
@@ -23,13 +24,15 @@ function DesktopPitch({ walker }: { walker: boolean }) {
         )}
       </h2>
       <p className="mt-4 text-lg leading-relaxed text-ink-soft">
-        {walker ? 'App del paseador: así ve un paseo, el chat y su verificación.' : 'Prototipo interactivo. En tu celular ocupa toda la pantalla.'}
+        {walker
+          ? 'Para estudiantes que viven o estudian en San Isidro y Jesús María.'
+          : 'Vecinos estudiantes de San Isidro y Jesús María pasean a tu perro.'}
       </p>
       <ul className="mt-8 space-y-4">
         {[
           { icon: ShieldCheck, t: textoHastaComprobaciones(), d: resumenComprobaciones() },
           { icon: Wallet, t: `Pago a ${NOMBRE_CORTO}`, d: walker ? TEXTOS_PAGO.honestidadPaseador : TEXTOS_PAGO.honestidad },
-          { icon: MapPin, t: 'Fotos y puntos de control (demostración)', d: 'Con hora y lugar, en San Isidro y Jesús María.' },
+          { icon: MapPin, t: 'Fotos y puntos de control', d: 'Con hora y lugar, en San Isidro y Jesús María.' },
         ].map((r) => (
           <li key={r.t} className="flex items-start gap-3.5">
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-ink text-brand-50">
@@ -42,10 +45,8 @@ function DesktopPitch({ walker }: { walker: boolean }) {
           </li>
         ))}
       </ul>
-      <p className="mt-9 rounded-3xl border border-ink/10 bg-paper/70 p-4 text-[14px] leading-relaxed text-ink-soft">
-        <b className="text-ink">Truco de demostración:</b> abre la app del {walker ? 'paseador' : 'cliente'} en una pestaña (esta) y la del {walker ? 'cliente' : 'paseador'} en otra:
-        el chat, las fotos y los avisos del paseo se pasan de una a otra (solo en el mismo navegador).
-      </p>
+      <p className="mt-9 text-[14px] font-bold text-ink">Pronto también como app para tu celular:</p>
+      <StoreBadges className="mt-3" />
     </aside>
   )
 }
