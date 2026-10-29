@@ -57,7 +57,7 @@ export function AficheClient({ building, code }: { building: string; code: strin
             El paseo <span className="italic underline decoration-gold decoration-[5px] underline-offset-[10px]">con cuidado</span> que tu mejor amigo merece.
           </h1>
           <p className="mt-6 max-w-[150mm] text-[16pt] leading-snug text-brand-50/90">
-            Estudiantes que viven o estudian en tu distrito. Con fotos y puntos de control (demostración) y pago a {NOMBRE_CORTO}.
+            Estudiantes que viven o estudian en tu distrito. Con fotos y puntos de control y pago a {NOMBRE_CORTO}.
           </p>
         </section>
 

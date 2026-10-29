@@ -41,7 +41,7 @@ const RULES: Array<{ n: string; title: string; text: string; mas?: string }> = [
   {
     n: '03',
     title: 'Fotos y puntos de control',
-    text: 'Fotos con hora y lugar, y avisos (demostración).',
+    text: 'Fotos con hora y lugar, y avisos.',
     mas: 'El seguimiento es por puntos de control con foto: la ubicación se registra al empezar, al terminar y en cada foto.',
   },
   {
@@ -265,7 +265,7 @@ export function Explore({
             que tu mejor amigo merece
           </h1>
           <p className="mt-4 max-w-[330px] text-[15px] leading-relaxed text-white">
-            Paseadores del barrio, con fotos y puntos de control (demostración). Piloto en San Isidro y Jesús María.
+            Paseadores del barrio, con fotos y puntos de control. Piloto en San Isidro y Jesús María.
           </p>
         </motion.div>
 
