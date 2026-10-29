@@ -88,8 +88,8 @@ export function PortraitAvatar({
             d="M30.5 44 C26 24 40 16 50 16 C61 16 74 24 69.5 44 C66.5 38 61 34 50 34 C39 34 33.5 38 30.5 44Z"
             fill={hair}
           />
-          <path d="M28 36 C28 17 40 10 50 10 C61 10 72 17 72 36 Z" fill="#ea580c" />
-          <path d="M26 36 H72 L86 40 C86 43 82 44.5 78 44.5 H28 Z" fill="#c2410c" />
+          <path d="M28 36 C28 17 40 10 50 10 C61 10 72 17 72 36 Z" fill="#cd4f27" />
+          <path d="M26 36 H72 L86 40 C86 43 82 44.5 78 44.5 H28 Z" fill="#ad3c1b" />
         </g>
       )}
 
@@ -108,7 +108,7 @@ export function PortraitAvatar({
       <path d="M50 46 Q48.5 51 50.5 52" stroke="#000" strokeOpacity=".18" strokeWidth="1.4" fill="none" strokeLinecap="round" />
       <path
         d="M43.5 55.5 Q50 61.5 56.5 55.5"
-        stroke={beard ? '#fff' : '#9a3412'}
+        stroke={beard ? '#fff' : '#8a2f16'}
         strokeWidth="1.8"
         fill="none"
         strokeLinecap="round"

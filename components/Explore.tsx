@@ -91,8 +91,8 @@ function ZoneThumb() {
     <svg viewBox="0 0 320 150" className="h-full w-full" aria-hidden>
       {paths.map((p) => (
         <g key={p.id}>
-          <path d={p.d} fill="#ea580c" fillOpacity=".14" stroke="#ea580c" strokeWidth="1.6" strokeDasharray="5 4" strokeLinejoin="round" />
-          <text x={p.c[0]} y={p.c[1]} textAnchor="middle" fontSize="11.5" fontWeight="800" fill="#9a3412" letterSpacing=".5" style={{ textTransform: 'uppercase' }}>
+          <path d={p.d} fill="#cd4f27" fillOpacity=".14" stroke="#cd4f27" strokeWidth="1.6" strokeDasharray="5 4" strokeLinejoin="round" />
+          <text x={p.c[0]} y={p.c[1]} textAnchor="middle" fontSize="11.5" fontWeight="800" fill="#8a2f16" letterSpacing=".5" style={{ textTransform: 'uppercase' }}>
             {p.name}
           </text>
         </g>

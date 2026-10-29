@@ -2,7 +2,7 @@
 export const btnPrimary =
   'btn-press inline-flex items-center justify-center gap-2 rounded-full bg-brand-700 font-extrabold text-white shadow-press'
 export const btnInk =
-  'btn-press inline-flex items-center justify-center gap-2 rounded-full bg-ink font-extrabold text-white shadow-press-ink'
+  'btn-press inline-flex items-center justify-center gap-2 rounded-full bg-vino font-extrabold text-white shadow-press-vino'
 export const btnForest =
   'btn-press inline-flex items-center justify-center gap-2 rounded-full bg-forest font-extrabold text-white shadow-press-forest'
 export const btnRed =

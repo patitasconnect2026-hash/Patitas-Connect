@@ -3,8 +3,8 @@ import { DISTRICTS, type LatLng } from '@/lib/geo'
 import type { LeafletLib } from './useLeaflet'
 
 /** Naranjas de la marca (`brand-700` para la línea, `brand-600` para el relleno). */
-const BORDE = '#c2410c'
-const RELLENO = '#ea580c'
+const BORDE = '#ad3c1b'
+const RELLENO = '#cd4f27'
 /** Velo gris azulado (`slate`): lo de afuera de la zona se ve apagado, pero se siguen leyendo los nombres del mapa. */
 const VELO = '#475569'
 

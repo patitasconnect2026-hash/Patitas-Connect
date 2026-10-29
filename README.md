@@ -1,4 +1,4 @@
-# Patitas Conectadas · prototipo v3
+# Patitas Connect · prototipo v3
 
 Marketplace de paseadores de perros para **San Isidro y Jesús María** (Lima). Es un prototipo 100 % frontend para mostrar a clientes y validar el negocio: no hay base de datos ni cobros reales. Incluye **la app del cliente (`/`)**, **la app del paseador (`/paseador`)** y un **panel interno de revisión (`/admin`)**.
 

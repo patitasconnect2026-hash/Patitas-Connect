@@ -8,7 +8,7 @@ description: Reglas, decisiones, especificaciones y criterios de calidad del pro
 ## 1. Qué es y en qué etapa está
 Marketplace de paseadores de perros (estudiantes verificados, vecinos del distrito) para San Isidro y Jesús María. Stack: Next.js 16, React 19, TypeScript, Tailwind 4, Framer Motion, Leaflet. Hoy es un prototipo solo-frontend: datos en localStorage; GPS, pagos, SMS y chat entre celulares simulados. Hay tres apps: cliente (/), paseador (/paseador) y panel interno (/admin). Lee README.md y docs/INFORME-PRODUCTO.md antes de empezar.
 Equipo: 3 estudiantes de 18 años. Una persona hace la lógica y las funciones, otra el diseño, otra el marketing y las encuestas.
-Nombre de la app: «Patitas Conectadas» (en el código, la constante `NOMBRE_APP` de lib/config.ts). Antes se llamaba «Patitas Connect».
+Nombre de la app: «Patitas Connect», como el logo oficial (en el código, la constante `NOMBRE_APP` de lib/config.ts). Del 10 al 29 de octubre de 2026 se llamó «Patitas Conectadas».
 
 ## 2. Reglas de oro
 1. Presupuesto cero: solo herramientas gratuitas. Si algo cuesta dinero o exige cuenta de pago, déjalo simulado, márcalo como simulado y avisa. No elijas base de datos, pasarela ni hosting sin preguntar.

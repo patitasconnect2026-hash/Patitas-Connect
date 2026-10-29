@@ -195,7 +195,7 @@ function ComoFunciona() {
         {PASOS.map((p, i) => (
           <motion.li key={p.t} {...aparecer} transition={{ duration: 0.3, delay: i * 0.06 }} className="rounded-3xl bg-canvas p-6 ring-1 ring-ink/5">
             <div className="flex items-center justify-between">
-              <span className="grid h-12 w-12 place-items-center rounded-2xl bg-ink text-brand-50">
+              <span className="grid h-12 w-12 place-items-center rounded-2xl bg-vino text-brand-50">
                 <p.icon size={22} aria-hidden />
               </span>
               <span className="font-display text-[40px] font-bold leading-none text-brand-200" aria-hidden>
@@ -213,7 +213,7 @@ function ComoFunciona() {
 
 function Confianza() {
   return (
-    <Seccion id="confianza" className="relative overflow-hidden bg-ink text-white">
+    <Seccion id="confianza" className="relative overflow-hidden bg-vino-800 text-white">
       <div className="grid gap-12 lg:grid-cols-[1fr_1.15fr] lg:gap-16">
         <div>
           <Titulo eyebrow="Confianza" claro>
@@ -359,7 +359,7 @@ function ParaPaseadores() {
           <motion.div {...aparecer} className="mt-9">
             <Link
               href="/paseador"
-              className="btn-press inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-ink px-6 text-[16px] font-extrabold text-white shadow-press-ink"
+              className="btn-press inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-vino px-6 text-[16px] font-extrabold text-white shadow-press-vino"
             >
               <Bike size={19} aria-hidden /> {TEXTO_PORTADA.serPaseador}
             </Link>
@@ -447,7 +447,7 @@ function Preguntas() {
 function Final({ onEntrar }: { onEntrar: () => void }) {
   return (
     <Seccion className="bg-canvas pt-0 md:pt-0">
-      <motion.div {...aparecer} className="relative overflow-hidden rounded-[2.5rem] bg-ink px-6 py-14 text-center text-white md:px-12 md:py-20">
+      <motion.div {...aparecer} className="relative overflow-hidden rounded-[2.5rem] bg-vino-800 px-6 py-14 text-center text-white md:px-12 md:py-20">
         <PawPattern id="final-huellas" />
         <div className="relative">
           <Image src="/marca/logo-mark.png" alt="" width={96} height={102} className="mx-auto h-24 w-auto rounded-full bg-brand-50 p-3" />
@@ -474,7 +474,7 @@ function Final({ onEntrar }: { onEntrar: () => void }) {
 
 function Pie({ onEntrar }: { onEntrar: () => void }) {
   return (
-    <footer className="bg-ink px-4 pb-[max(2.5rem,env(safe-area-inset-bottom))] pt-14 text-white sm:px-6">
+    <footer className="bg-vino-900 px-4 pb-[max(2.5rem,env(safe-area-inset-bottom))] pt-14 text-white sm:px-6">
       <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
         <div>
           <Logo tone="cream" size={44} />
@@ -559,7 +559,7 @@ export function Landing({ onEntrar }: { onEntrar: () => void }) {
               <button
                 type="button"
                 onClick={onEntrar}
-                className="btn-press inline-flex min-h-11 items-center gap-1.5 rounded-full bg-ink px-5 text-[15px] font-extrabold text-white shadow-press-ink"
+                className="btn-press inline-flex min-h-11 items-center gap-1.5 rounded-full bg-vino px-5 text-[15px] font-extrabold text-white shadow-press-vino"
               >
                 {TEXTO_PORTADA.entrar}
               </button>

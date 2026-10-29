@@ -27,8 +27,8 @@ const sinComentarios = (s: string) => s.replace(/\/\*[\s\S]*?\*\//g, '').replace
 const EXCEPCIONES: Array<{ archivo: string; razon: string }> = []
 
 describe('nombre de la app', () => {
-  it('el nombre es «Patitas Conectadas» y sale de una sola constante', () => {
-    expect(NOMBRE_APP).toBe('Patitas Conectadas')
+  it('el nombre es «Patitas Connect» (como el logo) y sale de una sola constante', () => {
+    expect(NOMBRE_APP).toBe('Patitas Connect')
   })
 
   it('el nombre corto es la primera palabra del nombre y cabe bajo el ícono del celular', () => {
@@ -37,15 +37,14 @@ describe('nombre de la app', () => {
   })
 
   /**
-   * El nombre viejo, escrito de cualquier manera que se vea en pantalla. Se mira el archivo ENTERO (no línea por línea):
-   * «Patitas\n connect», «Patitas&nbsp;connect», «Patitas{' '}connect», «Patitas <span>connect</span>» y «PatitasConnect».
-   * «patitas-connect» (con guion) es el nombre interno de paquete, carpeta y claves: se permite.
+   * El nombre anterior («Patitas Conectadas», del 10 al 29 de octubre de 2026), escrito de cualquier manera que se vea
+   * en pantalla. Se mira el archivo ENTERO (no línea por línea): «Patitas\n conectadas», «Patitas&nbsp;conectadas»,
+   * «Patitas{' '}conectadas» y «Patitas <span>conectadas</span>».
    */
   const NOMBRE_VIEJO: Array<{ nombre: string; patron: RegExp }> = [
-    { nombre: 'Patitas connect (con espacio, salto de línea, &nbsp; o {\' \'})', patron: /patitas(?:\s|&nbsp;|&#160;|\u00a0|\{\s*(['"`])\s*\1\s*\})+connect\b/i },
-    { nombre: 'Patitas <span>connect</span>', patron: /patitas\s*(?:<[^>]*>\s*)+connect\b/i },
-    { nombre: 'PatitasConnect', patron: /patitasconnect/i },
-    { nombre: '«connect» solo, como palabra del logo', patron: /(?:>\s*|['"`])connect(?:\s*<|['"`])/i },
+    { nombre: 'Patitas conectadas (con espacio, salto de línea, &nbsp; o {\' \'})', patron: /patitas(?:\s|&nbsp;|&#160;|\u00a0|\{\s*(['"`])\s*\1\s*\})+conectadas\b/i },
+    { nombre: 'Patitas <span>conectadas</span>', patron: /patitas\s*(?:<[^>]*>\s*)+conectadas\b/i },
+    { nombre: '«conectadas» solo, como palabra del logo', patron: /(?:>\s*|['"`])conectadas(?:\s*<|['"`])/i },
   ]
 
   it('el nombre viejo no aparece en ningún texto visible (el código sin comentarios)', () => {
@@ -63,26 +62,26 @@ describe('nombre de la app', () => {
   })
 
   it('la prueba sabe ver el nombre viejo escrito de las formas difíciles', () => {
-    const casos = ['Patitas Connect', 'patitas  connect', 'Patitas\n      connect', 'Patitas&nbsp;connect', "Patitas{' '}connect", 'Patitas <span class="x">connect</span>', 'PatitasConnect', '<i>connect</i>']
+    const casos = ['Patitas Conectadas', 'patitas  conectadas', 'Patitas\n      conectadas', 'Patitas&nbsp;conectadas', "Patitas{' '}conectadas", 'Patitas <span class="x">conectadas</span>', '<i>conectadas</i>']
     for (const c of casos) expect(NOMBRE_VIEJO.some((n) => n.patron.test(c)), JSON.stringify(c)).toBe(true)
     // el nombre interno y el actual no deben saltar
-    for (const c of ['patitas-connect', 'patitas-connect.vercel.app', 'Patitas Conectadas', 'Patitas <span>conectadas</span>']) {
+    for (const c of ['patitas-connect', 'patitas-connect.vercel.app', 'Patitas Connect', 'Patitas <span>Connect</span>']) {
       expect(NOMBRE_VIEJO.some((n) => n.patron.test(c)), JSON.stringify(c)).toBe(false)
     }
   })
 
-  it('el logo escribe «Patitas» y «conectadas» y se anuncia con el nombre completo', () => {
+  it('el logotipo escribe «Patitas» y «Connect» y se anuncia con el nombre completo', () => {
     const html = renderToStaticMarkup(Logo({ tone: 'orange', size: 36 }))
     expect(html).toContain('Patitas')
-    expect(html).toContain('conectadas')
+    expect(html).toContain('Connect')
     expect(html).toContain(`aria-label="${NOMBRE_APP}"`)
-    expect(html).not.toMatch(/connect\b/i)
+    expect(html).not.toMatch(/conectadas/i)
   })
 
   it('el mensaje de WhatsApp del SOS usa el nombre nuevo', async () => {
     const { mensajeSos } = await import('./sos')
     const m = mensajeSos({ quien: 'paseador', perro: 'Max', paseador: 'Carlos', posicion: null })
     expect(m).toContain(NOMBRE_APP)
-    expect(m).not.toMatch(/patitas connect/i)
+    expect(m).not.toMatch(/patitas conectadas/i)
   })
 })

@@ -1,5 +1,5 @@
 /**
- * Chasqui: la mascota de Patitas Conectadas.
+ * Chasqui: la mascota de Patitas Connect.
  * Un perro dorado con chullo (el gorro andino). Los chasquis eran los mensajeros que
  * corrían los caminos del Tahuantinsuyo: un perro que lleva y trae noticias de tu mascota.
  */
@@ -9,8 +9,8 @@ export const FUR = '#f4b04a'
 export const FUR_D = '#e08a1e'
 export const EAR = '#b45309'
 export const MUZ = '#fde7b8'
-export const ORG = '#ea580c'
-export const ORG_D = '#9a3412'
+export const ORG = '#cd4f27'
+export const ORG_D = '#8a2f16'
 export const CREAM = '#fff4ea'
 const PINK = '#fb7185'
 

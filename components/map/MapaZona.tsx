@@ -24,7 +24,7 @@ export function MapaZona({ centro, modo }: { centro: LatLng; modo: 'aproximada' 
     const punto: LatLng = [lat, lng]
     const capa =
       modo === 'aproximada'
-        ? L.circle(punto, { radius: CONFIG.radioZonaAproximadaMetros, color: '#c2410c', weight: 2, fillColor: '#ea580c', fillOpacity: 0.18 })
+        ? L.circle(punto, { radius: CONFIG.radioZonaAproximadaMetros, color: '#ad3c1b', weight: 2, fillColor: '#cd4f27', fillOpacity: 0.18 })
         : L.circleMarker(punto, { radius: 9, color: '#fff', weight: 3, fillColor: '#0f172a', fillOpacity: 1 })
     capa.addTo(map)
     map.setView(punto, modo === 'aproximada' ? 15 : 17, { animate: false })

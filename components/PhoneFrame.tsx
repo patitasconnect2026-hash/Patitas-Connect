@@ -35,7 +35,7 @@ function DesktopPitch({ walker }: { walker: boolean }) {
           { icon: MapPin, t: 'Fotos y puntos de control', d: 'Con hora y lugar, en San Isidro y Jesús María.' },
         ].map((r) => (
           <li key={r.t} className="flex items-start gap-3.5">
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-ink text-brand-50">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-vino text-brand-50">
               <r.icon size={19} />
             </span>
             <span>

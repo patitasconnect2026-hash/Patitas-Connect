@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils'
 type Tone = 'orange' | 'cream' | 'ink'
 
 /**
- * Marca de Patitas Conectadas: el perro grande abrazando al cachorro (el logo que nos dio el equipo).
+ * Isotipo de Patitas Connect: el perro grande abrazando al cachorro (el logo que nos dio el equipo).
  * Sobre fondo claro va suelta; sobre fondo naranja u oscuro ("cream"/"ink") lleva una placa blanca
  * redonda debajo, porque la imagen no cambia de color sola.
  */
@@ -43,7 +43,11 @@ export function LogoMark({
   )
 }
 
-/** Marca + nombre. "Patitas" en serif, "conectadas" en cursiva (sale de NOMBRE_APP). */
+/**
+ * Logotipo de Patitas Connect, como el logo oficial (public/marca/logo-lockup.png): el isotipo y, al lado, «PATITAS» grande
+ * en terracota y «CONNECT» debajo en vino, espaciado, con la letra del logo (Cinzel). Sobre fondo oscuro o naranja
+ * ("cream"/"ink") las letras van en crema.
+ */
 export function Logo({
   tone = 'orange',
   size = 36,
@@ -55,13 +59,23 @@ export function Logo({
   animated?: boolean
   className?: string
 }) {
-  const text = tone === 'cream' ? 'text-brand-50' : 'text-ink'
+  const [uno, dos] = partesNombre()
+  const claro = tone !== 'orange'
   return (
     <span className={cn('inline-flex items-center gap-2', className)}>
       <LogoMark size={size} tone={tone} animated={animated} />
-      <span className={cn('font-display flex items-baseline gap-1 leading-none', text)} style={{ fontSize: size * 0.58 }}>
-        <span className="font-bold">{partesNombre()[0]}</span>
-        <span className={cn('italic font-medium', tone === 'cream' ? 'text-brand-100' : 'text-brand')}>{partesNombre()[1]}</span>
+      <span className="font-display flex flex-col items-center leading-none" aria-hidden>
+        <span className={cn('font-bold uppercase', claro ? 'text-brand-50' : 'text-brand-600')} style={{ fontSize: size * 0.56, letterSpacing: '0.02em' }}>
+          {uno}
+        </span>
+        {dos && (
+          <span
+            className={cn('font-semibold uppercase', claro ? 'text-brand-100' : 'text-vino')}
+            style={{ fontSize: size * 0.27, letterSpacing: '0.34em', marginTop: size * 0.05, marginRight: '-0.34em' }}
+          >
+            {dos}
+          </span>
+        )}
       </span>
     </span>
   )

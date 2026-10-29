@@ -3,25 +3,32 @@
 
 @theme inline {
   --font-sans: var(--font-figtree), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-display: var(--font-cinzel), ui-serif, Georgia, serif;
 }
 
 @theme {
-  /* Marca (se mantienen los colores originales del brief) */
-  --color-brand: #ea580c;
-  --color-brand-50: #fff4ea;
-  --color-brand-100: #ffe4cc;
-  --color-brand-200: #fdc79a;
-  --color-brand-300: #fba561;
-  --color-brand-400: #f77f2c;
-  --color-brand-500: #f06a14;
-  --color-brand-600: #ea580c;
-  --color-brand-700: #c2410c;
-  --color-brand-800: #9a3412;
-  --color-brand-900: #7c2d12;
-  --color-ink: #0f172a;
+  /* Marca: la terracota de «PATITAS» y el vino de «CONNECT», sacados del logo de Patitas Connect */
+  --color-brand: #cd4f27;
+  --color-brand-50: #fdf3ee;
+  --color-brand-100: #fae0d4;
+  --color-brand-200: #f3bea6;
+  --color-brand-300: #e99672;
+  --color-brand-400: #df7148;
+  --color-brand-500: #d65d33;
+  --color-brand-600: #cd4f27;
+  --color-brand-700: #ad3c1b;
+  --color-brand-800: #8a2f16;
+  --color-brand-900: #6c2513;
+  --color-vino: #5b2229;
+  --color-vino-50: #f8eced;
+  --color-vino-100: #ecd0d3;
+  --color-vino-200: #d7a5ab;
+  --color-vino-700: #4b1b21;
+  --color-vino-800: #3d161b;
+  --color-vino-900: #2e1014;
+  --color-ink: #140809;
   /* Texto secundario: un solo gris con contraste >= 4,5:1 sobre crema, arena y blanco. Reemplaza text-ink/30 a /65. */
-  --color-ink-soft: #566073;
+  --color-ink-soft: #64504f;
 
   /* Papel cálido en lugar de gris frío: se siente hecho a mano */
   --color-canvas: #fbf6ee;
@@ -40,6 +47,7 @@
   --shadow-pop: 0 18px 40px -18px rgb(15 23 42 / 0.45);
   --shadow-press: 0 3px 0 var(--color-brand-800);
   --shadow-press-ink: 0 3px 0 #000;
+  --shadow-press-vino: 0 3px 0 #2e1014;
   --shadow-press-forest: 0 3px 0 #0b3d27;
   --shadow-press-red: 0 3px 0 #7f1d1d;
 }
@@ -74,8 +82,13 @@ button:disabled {
 
 .font-display {
   font-family: var(--font-display);
-  font-variation-settings: "SOFT" 70, "WONK" 0;
-  letter-spacing: -0.015em;
+  letter-spacing: 0.01em;
+}
+
+/* La letra del logo no tiene cursiva: lo que antes iba en cursiva se distingue solo por el color. */
+.font-display .italic,
+.font-display.italic {
+  font-style: normal;
 }
 
 @utility no-scrollbar {

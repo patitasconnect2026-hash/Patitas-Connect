@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Figtree, Fraunces } from 'next/font/google'
+import { Cinzel, Figtree } from 'next/font/google'
 import './globals.css'
 import { NOMBRE_APP, NOMBRE_CORTO } from '@/lib/config'
 
@@ -9,12 +9,10 @@ const figtree = Figtree({
   display: 'swap',
 })
 
-/** Serif con carácter para titulares y números: le da calidez y oficio. */
-const fraunces = Fraunces({
+/** La letra del logo de Patitas Connect (romana clásica, en mayúsculas): logotipo y titulares. */
+const cinzel = Cinzel({
   subsets: ['latin'],
-  axes: ['SOFT', 'opsz'],
-  style: ['normal', 'italic'],
-  variable: '--font-fraunces',
+  variable: '--font-cinzel',
   display: 'swap',
 })
 
@@ -30,7 +28,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#ea580c',
+  themeColor: '#cd4f27',
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
@@ -38,7 +36,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" className={`${figtree.variable} ${fraunces.variable}`}>
+    <html lang="es" className={`${figtree.variable} ${cinzel.variable}`}>
       <body className="font-sans antialiased">{children}</body>
     </html>
   )

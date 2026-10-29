@@ -122,7 +122,7 @@ export function ZonesMap({
           className: '',
           iconSize: [34, 34],
           iconAnchor: [17, 17],
-          html: `<div style="width:34px;height:34px;border-radius:999px;background:#ea580c;border:3px solid ${on ? '#0f172a' : '#fff'};display:grid;place-items:center;color:#fff;font:800 13px var(--font-sans);box-shadow:0 6px 14px -4px rgba(0,0,0,.5)">${w.firstName[0]}</div>`,
+          html: `<div style="width:34px;height:34px;border-radius:999px;background:#cd4f27;border:3px solid ${on ? '#0f172a' : '#fff'};display:grid;place-items:center;color:#fff;font:800 13px var(--font-sans);box-shadow:0 6px 14px -4px rgba(0,0,0,.5)">${w.firstName[0]}</div>`,
         }),
       })
         .on('click', () => setSelected({ kind: 'walker', id: w.id }))

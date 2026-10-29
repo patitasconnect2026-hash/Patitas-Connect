@@ -1,6 +1,6 @@
-# Patitas Conectadas
+# Patitas Connect
 
-El nombre de la app es «Patitas Conectadas» (constante `NOMBRE_APP` en `lib/config.ts`; no escribas el nombre a mano en los textos). La carpeta, el paquete, las skills y las claves de `localStorage` (`patitas:…`) conservan su nombre actual.
+El nombre de la app es «Patitas Connect», como el logo oficial (`public/marca/logo-lockup.png`; constante `NOMBRE_APP` en `lib/config.ts`; no escribas el nombre a mano en los textos). Letra del logotipo y los titulares: Cinzel; colores: terracota (`brand`) y vino (`vino`), en `app/globals.css`. La carpeta, el paquete, las skills y las claves de `localStorage` (`patitas:…`) conservan su nombre actual.
 
 Marketplace de paseadores de perros verificados en San Isidro y Jesús María (Lima). Equipo de 3 estudiantes, presupuesto cero, etapa de piloto sin cobros. Next.js 16, React 19, TypeScript, Tailwind 4.
 

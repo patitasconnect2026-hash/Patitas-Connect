@@ -19,7 +19,7 @@ export interface PuntoMapa {
   demo: boolean
 }
 
-const COLOR: Record<TipoPuntoLista, string> = { inicio: '#15803d', foto: '#c2410c', fin: '#0f172a' }
+const COLOR: Record<TipoPuntoLista, string> = { inicio: '#15803d', foto: '#ad3c1b', fin: '#0f172a' }
 
 /** El marcador: un círculo de color con el número de la foto, «I» (inicio) o «F» (fin), y su nombre debajo. */
 function iconoPunto(p: PuntoMapa): string {

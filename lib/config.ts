@@ -7,18 +7,19 @@ import { esCelularPeru, normalizarTelefono } from './telefono'
 import type { PaymentMethod, Plan } from './types'
 
 /**
- * Nombre de la app, tal como se escribe en cualquier texto visible. El logo usa "Patitas" en serif y
- * "conectadas" en cursiva (componente Logo). No se renombran carpeta, paquete, skills ni claves de localStorage.
+ * Nombre de la app, tal como se escribe en cualquier texto visible (decisión de Yahrod, 29 de octubre de 2026: la marca
+ * es «Patitas Connect», como el logo). El logotipo escribe «PATITAS» en terracota y «CONNECT» en vino, con la letra
+ * del logo (componente Logo).
  */
-export const NOMBRE_APP = 'Patitas Conectadas'
+export const NOMBRE_APP = 'Patitas Connect'
 
 /** El nombre corto: ícono del celular y frases como «Contacto de Patitas». Es la primera palabra del nombre. */
 export const NOMBRE_CORTO = 'Patitas'
 
-/** Las dos partes del logo: «Patitas» (serif) y «conectadas» (cursiva). Si el nombre tuviera una sola palabra, la cursiva queda vacía. */
+/** Las dos partes del logotipo: «Patitas» (terracota) y «Connect» (vino). Si el nombre tuviera una sola palabra, la segunda queda vacía. */
 export function partesNombre(nombre: string = NOMBRE_APP): [string, string] {
   const [primera, ...resto] = nombre.trim().split(/\s+/)
-  return [primera ?? '', resto.join(' ').toLowerCase()]
+  return [primera ?? '', resto.join(' ')]
 }
 
 export type ModoComision = 'del_precio' | 'sobre_el_precio'
