@@ -29,6 +29,7 @@ import { Logo, PawMark } from '../ui/Logo'
 import { StoreBadges } from '../ui/StoreBadges'
 import { Abanico, Carrusel, FranjaGigante, PestanasSubrayadas, TextoCircular, TextoRevuelto } from '../ui/Movimiento'
 import { PawPattern } from '../Onboarding'
+import { Entrada } from './Entrada'
 
 /** Textos de la portada pública. Todo lo que se promete aquí existe en la app (ver la skill patitas-connect, sección 6). */
 export const TEXTO_PORTADA = {
@@ -153,15 +154,16 @@ const POSICION_AVISOS = ['left-0 top-[12%] sm:-left-4', 'right-0 top-[46%] sm:-r
 function Portada({ onEntrar }: { onEntrar: () => void }) {
   const [publico, setPublico] = useState<Publico>('familia')
   const reducir = useReducedMotion()
-  const { scrollY } = useScroll()
+  const seccion = useRef<HTMLElement>(null)
+  const { scrollYProgress: avancePortada } = useScroll({ target: seccion, offset: ['start start', 'end start'] })
   // Parallax suave del isotipo y del círculo (capas que se mueven a distinta velocidad, como en Rainforest).
-  const yCirculo = useTransform(scrollY, [0, 600], [0, reducir ? 0 : 60])
-  const yLogo = useTransform(scrollY, [0, 600], [0, reducir ? 0 : -40])
-  const giro = useTransform(scrollY, [0, 600], [0, reducir ? 0 : 8])
+  const yCirculo = useTransform(avancePortada, [0, 1], [0, reducir ? 0 : 60])
+  const yLogo = useTransform(avancePortada, [0, 1], [0, reducir ? 0 : -40])
+  const giro = useTransform(avancePortada, [0, 1], [0, reducir ? 0 : 8])
   const p = PORTADA[publico]
 
   return (
-    <section className="relative overflow-hidden px-4 pb-24 pt-8 sm:px-6 md:pb-32 md:pt-14">
+    <section ref={seccion} id="inicio" className="relative scroll-mt-16 overflow-hidden px-4 pb-24 pt-8 sm:px-6 md:scroll-mt-20 md:pb-32 md:pt-14">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
@@ -279,21 +281,6 @@ function Portada({ onEntrar }: { onEntrar: () => void }) {
           </AnimatePresence>
         </div>
       </div>
-
-      {/* «Desliza para descubrir», como en TAG Heuer. */}
-      <a
-        href="#caminos"
-        className="relative mx-auto mt-14 hidden w-fit flex-col items-center gap-2 text-[13px] font-extrabold uppercase tracking-[0.2em] text-ink-soft md:flex"
-      >
-        Desliza para descubrir
-        <span className="relative block h-10 w-px overflow-hidden bg-ink/15">
-          <motion.span
-            className="absolute left-0 top-0 block h-4 w-px bg-brand-700"
-            animate={reducir ? undefined : { y: [-16, 40] }}
-            transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
-          />
-        </span>
-      </a>
 
       {/* Borde curvo abajo, como en Paws Playgrounds. */}
       <svg aria-hidden viewBox="0 0 1440 80" preserveAspectRatio="none" className="absolute inset-x-0 bottom-0 h-10 w-full text-vino md:h-16">
@@ -1074,6 +1061,10 @@ function Pie({ onEntrar }: { onEntrar: () => void }) {
         <p>© {NOMBRE_APP}. Proyecto piloto de estudiantes.</p>
         <p>San Isidro · Jesús María · Lima, Perú</p>
       </div>
+      <div className="mx-auto mt-3 max-w-6xl text-[13px] text-white/70">
+        <p>
+          Fotos de la entrada: Unsplash. No son paseos de {NOMBRE_CORTO}.</p>
+      </div>
     </footer>
   )
 }
@@ -1112,6 +1103,7 @@ export function Landing({ onEntrar }: { onEntrar: () => void }) {
           </div>
         </header>
         <main>
+          <Entrada />
           <Portada onEntrar={onEntrar} />
           <Marquesina />
           <Caminos onEntrar={onEntrar} />
