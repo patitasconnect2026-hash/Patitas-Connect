@@ -158,7 +158,7 @@ function Lienzo({ d, id, className }: { d: Diseno; id: string; className?: strin
           )
         })}
         <filter id={`${id}-sombra`} x="-10%" y="-10%" width="120%" height="130%">
-          <feDropShadow dx="0" dy={d.ancho / 160} stdDeviation={d.ancho / 120} floodColor="#2e1014" floodOpacity="0.28" />
+          <feDropShadow dx="0" dy={d.ancho / 160} stdDeviation={d.ancho / 120} floodColor="#ad3c1b" floodOpacity="0.22" />
         </filter>
         {/* Máscara: todo menos el interior de las letras. */}
         <mask id={`${id}-fuera`} maskUnits="userSpaceOnUse" x="0" y="0" width={d.ancho} height={d.alto}>
@@ -214,7 +214,7 @@ function Lienzo({ d, id, className }: { d: Diseno; id: string; className?: strin
         </g>
       </motion.g>
 
-      {/* 4. Contorno doble (vino por fuera, crema junto a la letra) encima de todo, solo por fuera de cada letra:
+      {/* 4. Borde blanco encima de todo, solo por fuera de cada letra:
           el nombre se reconoce al instante sin adelgazar las letras. */}
       <motion.g
         initial={{ opacity: 0 }}
@@ -224,8 +224,7 @@ function Lienzo({ d, id, className }: { d: Diseno; id: string; className?: strin
         strokeLinejoin="round"
         mask={`url(#${id}-fuera)`}
       >
-        {d.lineas.map((l) => linea(l, { stroke: '#3d161b', strokeWidth: l.contorno * 3.4, strokeOpacity: 0.85 }))}
-        {d.lineas.map((l) => linea(l, { stroke: '#fff7ee', strokeWidth: l.contorno * 1.8 }))}
+        {d.lineas.map((l) => linea(l, { stroke: '#ffffff', strokeWidth: l.contorno * 3 }))}
       </motion.g>
     </svg>
   )
