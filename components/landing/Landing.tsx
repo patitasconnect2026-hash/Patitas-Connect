@@ -22,12 +22,13 @@ import {
   Wallet,
   X,
 } from 'lucide-react'
-import { CONFIG, NOMBRE_APP, NOMBRE_CORTO, TEXTOS_PAGO, textoPlanLunesViernes } from '@/lib/config'
+import { CONFIG, LEMA, NOMBRE_APP, NOMBRE_CORTO, TEXTOS_PAGO, textoPlanLunesViernes } from '@/lib/config'
 import { DURATIONS } from '@/lib/data'
 import { FOTOS_PERROS } from '@/lib/fotosPerros'
 import { COMPROBACIONES, MAX_PERROS_POR_PASEO, REGLA_NUEVO, textoHastaComprobaciones } from '@/lib/verificacion'
 import { cn } from '@/lib/utils'
 import { Logo, PawMark } from '../ui/Logo'
+import { Redes } from '../ui/Redes'
 import { StoreBadges } from '../ui/StoreBadges'
 import {
   Abanico,
@@ -147,10 +148,10 @@ const PORTADA: Record<
     pestana: 'Tengo un perro',
     titulo: (
       <>
-        El paseo <span className="text-brand-700">con cuidado</span> que tu mejor amigo merece.
+        Paseos <span className="text-brand-700">felices</span>, dueños tranquilos.
       </>
     ),
-    texto: 'Vecinos estudiantes de San Isidro y Jesús María pasean a tu perro. Ves fotos con hora y lugar, entregas con un código y pagas al terminar.',
+    texto: 'Paseadores de tu barrio para tu perro. Tú eliges el horario, ves fotos del paseo y pagas al terminar.',
     avisos: [
       { icon: Camera, t: 'Foto del paseo', d: 'Con hora y lugar' },
       { icon: KeyRound, t: 'Código de recojo', d: 'Lo das tú al entregar' },
@@ -165,10 +166,10 @@ const PORTADA: Record<
     pestana: 'Quiero pasear perros',
     titulo: (
       <>
-        Gana paseando perros de tu <span className="text-brand-700">barrio</span>.
+        Pasea perros. Gana <span className="text-brand-700">entre clases</span>.
       </>
     ),
-    texto: `Para estudiantes mayores de 18 que viven o estudian en San Isidro o Jesús María. Tú pones tu tarifa y tus horarios.`,
+    texto: `Para estudiantes mayores de 18 de San Isidro o Jesús María. Tu tarifa, tus horarios, sin chocar con tus clases.`,
     avisos: [
       {
         icon: Wallet,
@@ -372,12 +373,12 @@ function Marquesina() {
 /* Manifiesto: la promesa en letras grandes que se encienden al bajar, y cifras reales que cuentan */
 /* ------------------------------------------------------------------ */
 
-const MANIFIESTO = `Un vecino estudiante pasea a tu perro. Tú ves fotos con hora y lugar, entregas con un código y pagas al terminar.`
+const MANIFIESTO = `Conectamos a tu perro con paseadores cercanos. Tú eliges el horario, ves cada paseo en fotos y pagas al terminar.`
 
 function Manifiesto() {
   const cifras = [
-    { n: 4, t: 'pasos, sin sorpresas' },
-    { n: COMPROBACIONES.length, t: 'comprobaciones posibles' },
+    { n: 4, t: 'pasos y listo' },
+    { n: COMPROBACIONES.length, t: 'comprobaciones del equipo' },
     { n: 2, t: 'distritos para empezar' },
     { n: 0, t: 'soles al reservar' },
   ]
@@ -387,7 +388,7 @@ function Manifiesto() {
       <div className="relative mx-auto max-w-5xl">
         <TextoQueSeEnciende
           texto={MANIFIESTO}
-          resaltar={['fotos', 'código', 'terminar.']}
+          resaltar={['cercanos.', 'fotos', 'terminar.']}
           className="font-display text-[28px] font-bold leading-[1.18] text-ink sm:text-[38px] md:text-[54px]"
         />
         <ul className="mt-14 grid grid-cols-2 gap-x-6 gap-y-8 border-t border-ink/10 pt-10 md:grid-cols-4">
@@ -432,7 +433,7 @@ function Ventana() {
       <motion.div style={{ y: texto }} className="relative flex h-full flex-col items-center justify-center px-6 text-center text-white">
         <p className="eyebrow text-brand-200">Cada paseo</p>
         <h2 id="ventana-titulo" className="font-display mt-4 max-w-3xl text-[40px] font-bold leading-[1.02] text-balance md:text-[76px]">
-          Cuidado de principio a fin.
+          Míralo feliz desde tu celular.
         </h2>
         <a href="#como-funciona" className={cn(btnContorno, 'mt-9')}>
           Ver cómo funciona <ArrowRight size={18} aria-hidden />
@@ -462,13 +463,13 @@ function Caminos({ onEntrar }: { onEntrar: () => void }) {
     {
       id: 'familias',
       eyebrow: 'Para familias',
-      titulo: 'Das a tu perro en paseo',
+      titulo: 'Tu perro, en buenas manos',
       fondo: 'bg-brand-700',
       puntos: [
-        `Eliges paseador, día y hora (${DURATIONS.join(', ')} minutos)`,
-        'Recibes fotos con hora y lugar durante el paseo',
-        'Entregas con un código de 4 dígitos',
-        `Pagas al terminar, a ${NOMBRE_CORTO}`,
+        `Eliges día, hora y duración: ${DURATIONS.join(', ')} minutos`,
+        'Eliges paseador o propones cuánto pagar',
+        'Pequeño, mediano o grande: paseos con perros de su tamaño',
+        `Fotos durante el paseo y pagas al terminar, a ${NOMBRE_CORTO}`,
       ],
       boton: (
         <button type="button" onClick={onEntrar} className={cn(btnVino, 'w-full sm:w-auto')}>
@@ -479,11 +480,11 @@ function Caminos({ onEntrar }: { onEntrar: () => void }) {
     {
       id: 'paseadores',
       eyebrow: 'Para paseadores',
-      titulo: 'Paseas perros y ganas',
+      titulo: 'Gana dinero entre clases',
       fondo: 'bg-vino-800',
       puntos: [
-        `Pones tu tarifa: entre S/ ${CONFIG.tarifaMinima} y S/ ${CONFIG.tarifaMaxima} por hora`,
-        'Eliges tus horarios y tus parques',
+        `Tu tarifa: de S/ ${CONFIG.tarifaMinima} a S/ ${CONFIG.tarifaMaxima} por hora`,
+        'Tus horarios, sin chocar con tus clases',
         'Te acompañamos en tu primer paseo',
         TEXTOS_PAGO.honestidadPaseador,
       ],
@@ -539,23 +540,23 @@ function Caminos({ onEntrar }: { onEntrar: () => void }) {
 const PASOS = [
   {
     icon: CalendarCheck,
-    t: 'Pide o reserva',
-    d: `Eliges día, hora y duración (${DURATIONS.join(', ')} minutos). No pagas nada al reservar.`,
+    t: 'Reserva en un minuto',
+    d: `Eliges día, hora y duración (${DURATIONS.join(', ')} minutos). Reservar no cuesta nada.`,
   },
   {
     icon: KeyRound,
     t: 'Entrega con código',
-    d: 'Le das al paseador un código de 4 dígitos al entregar a tu perro.',
+    d: 'Tu perro sale solo cuando das tu código de 4 dígitos.',
   },
   {
     icon: Camera,
-    t: 'Fotos y puntos de control',
-    d: 'Durante el paseo recibes fotos con hora y lugar, tomadas con la cámara de la app.',
+    t: 'Míralo pasear',
+    d: 'Recibes fotos con hora y lugar, tomadas con la cámara de la app.',
   },
   {
     icon: Wallet,
-    t: 'Recibes y pagas',
-    d: `Tocas «Recibí a tu perro» y le pagas a ${NOMBRE_CORTO}. ${NOMBRE_CORTO} le paga al paseador.`,
+    t: 'Recíbelo y paga',
+    d: `Confirmas que llegó bien y le pagas a ${NOMBRE_CORTO}. ${NOMBRE_CORTO} le paga al paseador.`,
   },
 ]
 
@@ -571,7 +572,7 @@ function ComoFunciona() {
     <Seccion id="como-funciona" className="bg-paper">
       <div className="grid gap-10 md:grid-cols-[1fr_1.2fr] md:gap-16">
         <div className="md:sticky md:top-28 md:self-start">
-          <Titulo eyebrow="Cómo funciona">Cuatro pasos, sin sorpresas.</Titulo>
+          <Titulo eyebrow="Cómo funciona">Así de fácil.</Titulo>
           <div className="mt-10 hidden items-end gap-4 md:flex" aria-hidden>
             <AnimatePresence mode="wait" initial={false}>
               <motion.span
@@ -772,7 +773,7 @@ function Tranquilidad() {
   return (
     <section id="tranquilidad" className="scroll-mt-20 bg-canvas pt-16 md:pt-24">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <Titulo eyebrow="Tu tranquilidad">Tres cosas que cuidan cada paseo.</Titulo>
+        <Titulo eyebrow="Tu tranquilidad">Tranquilo en cada paseo.</Titulo>
       </div>
       <ul className="mt-10 flex flex-col md:h-[78vh] md:max-h-[720px] md:min-h-[520px] md:flex-row">
         {HISTORIAS.map((h, i) => (
@@ -831,7 +832,7 @@ function Confianza() {
             {textoHastaComprobaciones()} antes de pasear.
           </Titulo>
           <motion.p {...aparecer} className="mt-5 max-w-lg text-[17px] leading-relaxed text-white/80">
-            Cada paseador muestra solo las comprobaciones que el equipo ya hizo. Si una no está marcada, no aparece.
+            Solo ves las comprobaciones que el equipo ya hizo. Nada inventado.
           </motion.p>
         </div>
         <motion.ul
@@ -919,9 +920,9 @@ function Precios({ onEntrar }: { onEntrar: () => void }) {
       <HuellasFlotantes className="text-brand-100/70" />
       <div className="grid items-start gap-12 lg:grid-cols-2">
         <div>
-          <Titulo eyebrow="Precios y pago">Pagas al terminar. A {NOMBRE_CORTO}, no al paseador.</Titulo>
+          <Titulo eyebrow="Precios y pago">Pagas al terminar. Ni un sol antes.</Titulo>
           <motion.p {...aparecer} className="mt-5 max-w-lg text-[17px] leading-relaxed text-ink-soft">
-            {TEXTOS_PAGO.honestidad} Pagas solo el precio del paseo, sin cargos extra, con Yape, Plin o transferencia.
+            {TEXTOS_PAGO.honestidad} Sin cargos extra: Yape, Plin o transferencia.
           </motion.p>
           <motion.div {...aparecer} className="mt-8">
             <button type="button" onClick={onEntrar} className={btnPrincipal}>
@@ -984,7 +985,7 @@ function Cobertura() {
   return (
     <section id="cobertura" className="scroll-mt-20 overflow-hidden bg-paper py-16 md:py-24">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <Titulo eyebrow="Dónde estamos">Empezamos por dos distritos, y bien hecho.</Titulo>
+        <Titulo eyebrow="Dónde estamos">Primero, tu barrio.</Titulo>
       </div>
       {/* Los distritos en letras gigantes, que se deslizan al bajar (como Geospace). */}
       <FranjaGigante texto="San Isidro · Jesús María · San Isidro ·" className="mt-8 text-brand-600/90" />
@@ -1083,9 +1084,9 @@ function App() {
     <Seccion id="app" className="relative overflow-hidden bg-sand">
       <div className="grid items-center gap-12 md:grid-cols-[1.1fr_1fr]">
         <div>
-          <Titulo eyebrow="La app">{NOMBRE_APP} en tu celular.</Titulo>
+          <Titulo eyebrow="La app">{NOMBRE_APP} en tu bolsillo.</Titulo>
           <motion.p {...aparecer} className="mt-5 max-w-lg text-[17px] leading-relaxed text-ink-soft">
-            Hoy funciona desde el navegador de tu celular, sin instalar nada. Muy pronto también como app, para familias y paseadores.
+            Hoy funciona desde tu navegador, sin instalar nada. La app ya está en camino.
           </motion.p>
           <motion.div {...aparecer} className="mt-8">
             <StoreBadges />
@@ -1109,10 +1110,9 @@ function QuienesSomos() {
           <HeartHandshake size={64} className="text-brand-700" aria-hidden />
         </div>
         <div>
-          <Titulo eyebrow="Quiénes somos">Tres estudiantes de Lima que aman a los perros.</Titulo>
+          <Titulo eyebrow="Quiénes somos">Tres estudiantes que aman a los perros.</Titulo>
           <motion.p {...aparecer} className="mt-5 max-w-2xl text-[17px] leading-relaxed text-ink-soft">
-            {NOMBRE_APP} es un piloto: empezamos con pocas familias para hacerlo bien. Una persona hace la web, otra el diseño y otra habla con las familias.
-            Todo lo que ves aquí es lo que la app hace hoy.
+            Somos un piloto en Lima: empezamos con pocas familias para hacerlo bien. Lo que ves aquí es lo que la app hace hoy.
           </motion.p>
         </div>
       </div>
@@ -1143,13 +1143,19 @@ function Final({ onEntrar }: { onEntrar: () => void }) {
             <Image src="/marca/logo-mark.png" alt="" width={96} height={102} className="mx-auto h-24 w-auto rounded-full bg-brand-50 p-3" />
           </motion.div>
           <h2 className="font-display mx-auto mt-6 max-w-2xl text-[34px] font-bold leading-[1.05] text-balance md:text-[50px]">
-            Tu perro feliz, tú <span className="text-brand-300">tranquilo</span>.
+            Paseos felices, dueños <span className="text-brand-300">tranquilos</span>.
           </h2>
-          <div className="mt-8 flex justify-center">
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
             <button type="button" onClick={onEntrar} className={btnPrincipal}>
               {TEXTO_PORTADA.reservar} <ArrowRight size={19} strokeWidth={2.6} aria-hidden />
             </button>
+            <Link href="/paseador" className={btnContorno}>
+              <Bike size={19} aria-hidden /> {TEXTO_PORTADA.serPaseador}
+            </Link>
           </div>
+          {/* Redes del anuncio: cada seguidor cuenta. */}
+          <p className="mt-10 text-[15px] font-bold text-brand-100">Síguenos y compártelo: cada seguidor cuenta.</p>
+          <Redes claro className="mt-4 justify-center" />
         </div>
       </motion.div>
     </Seccion>
@@ -1244,7 +1250,10 @@ function Pie({ onEntrar }: { onEntrar: () => void }) {
       <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-[1.4fr_1fr_1fr]">
         <div>
           <Logo tone="cream" size={44} />
-          <p className="mt-4 max-w-xs text-[15px] leading-relaxed text-white/75">Paseos de perros con vecinos estudiantes. {TEXTO_PORTADA.piloto}, Lima.</p>
+          <p className="font-display mt-4 max-w-xs text-[18px] font-bold leading-snug text-brand-100">{LEMA}</p>
+          <p className="mt-2 max-w-xs text-[15px] leading-relaxed text-white/75">{TEXTO_PORTADA.piloto}, Lima.</p>
+          <p className="mt-6 text-[14px] font-extrabold text-brand-200">Síguenos</p>
+          <Redes claro className="mt-3" />
         </div>
         <nav aria-label="Familias">
           <p className="text-[14px] font-extrabold text-brand-200">Familias</p>

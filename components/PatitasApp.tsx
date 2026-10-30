@@ -59,7 +59,6 @@ import { SosSheet } from './SosSheet'
 import { QuienesSomosSheet } from './QuienesSomosSheet'
 import { SiAlgoPasaSheet } from './SiAlgoPasaSheet'
 import { ZonesMap } from './ZonesMap'
-import { LogoMark } from './ui/Logo'
 
 /** Qué eventos del paseo se muestran como notificación push. */
 const TOAST_TITLES: Partial<Record<EventKind, string>> = {
@@ -843,12 +842,9 @@ export function PatitasApp() {
 
   /* ---------- Con servidor: la sesión manda ---------- */
   // Mientras se lee la sesión (o se lleva a la persona a la app de su rol) NUNCA se ve la portada.
-  if (modoApp === 'cargando' || modoApp === 'ir') {
-    return (
-      <PhoneFrame>
-        <PantallaEspera tipo="cargando" />
-      </PhoneFrame>
-    )
+  // Sin pantalla naranja ni marco de teléfono: al recargar solo se ve el fondo de la web un instante, sin interrumpir.
+  if (modoApp === 'cargando' || modoApp === 'ir' || !store) {
+    return <div role="status" aria-label="Cargando" className="min-h-dvh bg-canvas" />
   }
   if (modoApp === 'no_se_pudo') {
     return (
@@ -862,17 +858,12 @@ export function PatitasApp() {
   // Quien llega sin cuenta ve primero la portada pública (la web de la marca). «Entrar» abre el alta o el inicio de sesión.
   // Si llegó por el enlace del correo, va directo a entrar.
   const desdePortada = mostrarOnboarding && (modoApp === 'local' || modoApp === 'entrada') && !acceso.llegoPorEnlace
-  if (store && desdePortada && !verApp) {
+  if (desdePortada && !verApp) {
     return <Landing onEntrar={() => setVerApp(true)} />
   }
 
   return (
     <PhoneFrame>
-          {!store ? (
-            <div className="flex flex-1 items-center justify-center bg-brand-600">
-              <LogoMark size={72} tone="cream" />
-            </div>
-          ) : (
             <>
               <AvisoDeServidor />
               <div ref={scrollRef} className="no-scrollbar relative z-0 min-h-0 flex-1 overflow-y-auto overscroll-contain">
@@ -1125,7 +1116,6 @@ export function PatitasApp() {
                 )}
               </AnimatePresence>
             </>
-          )}
     </PhoneFrame>
   )
 }

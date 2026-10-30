@@ -1,7 +1,7 @@
 # Avance
 
 Estado del trabajo para que una sesión nueva sepa dónde vamos. **Este archivo es lo que se lee siempre**; el detalle de lo hecho está en [`HISTORIAL.md`](HISTORIAL.md) y solo se abre cuando haga falta. Se actualiza al terminar cada tarea.
-Última actualización: 30 de octubre de 2026 (pedido de Yahrod: **animaciones al bajar inspiradas en BAO London**: las secciones se apilan como cartas (`Capa` en `components/ui/Movimiento.tsx`), manifiesto que se enciende palabra por palabra, cifras que cuentan, foto que se abre (`Ventana`), títulos que suben por palabras, marquesina que se inclina con la velocidad, huellas con profundidad. Todo se queda quieto con «reducir movimiento». El panel «Leer más» va en un portal para no moverse con las capas.)
+Última actualización: 30 de octubre de 2026 (pedido de Yahrod: **intro como el video de Lightspark** en `components/landing/Entrada.tsx` (fotos desenfocadas por toda la pantalla que se acomodan alrededor del nombre), **secciones como cartas sin taparse** (`Capa` ya no se pega: cada carta deja un margen abajo), **sin pantalla naranja al recargar** (`PatitasApp.tsx` muestra solo el fondo mientras carga), **textos de marketing** según el anuncio del equipo (lema `LEMA` y redes `REDES` en `lib/config.ts`, íconos en `components/ui/Redes.tsx`, en el final y el pie). Pendiente: el anuncio habla de «residentes» como paseadores y la app pide estudiantes.)
 
 ## Cómo comprobar que nada se rompió
 

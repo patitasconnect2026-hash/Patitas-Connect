@@ -256,8 +256,9 @@ export function PestanasSubrayadas<T extends string>({
 /* Movimiento al bajar (como BAO London): secciones que se apilan como cartas, textos que se encienden, cifras que cuentan */
 /* ------------------------------------------------------------------ */
 
-/** Una sección que se queda quieta al terminar y deja que la siguiente pase por encima, como una carta sobre otra.
- *  Mientras la tapan, se achica un poco y se oscurece. Con «reducir movimiento» es una sección normal. */
+/** Una sección con forma de carta: al llegar a la pantalla sube, se ensancha y redondea menos sus esquinas (como BAO London).
+ *  No se queda pegada ni tapa a nadie: cada carta deja un margen abajo para que la siguiente se apoye solo sobre ese margen,
+ *  así al subir o bajar todo el texto se ve completo. Con «reducir movimiento» queda quieta. */
 export function Capa({
   children,
   className,
@@ -271,43 +272,23 @@ export function Capa({
 }) {
   const ref = useRef<HTMLDivElement>(null)
   const reducir = useReducedMotion()
-  const [tope, setTope] = useState(0)
-
-  // Si la sección es más alta que la pantalla, se queda pegada recién cuando se ve su final.
-  useEffect(() => {
-    const el = ref.current
-    if (!el || reducir) return
-    const medir = () => setTope(Math.min(0, window.innerHeight - el.offsetHeight))
-    medir()
-    const obs = new ResizeObserver(medir)
-    obs.observe(el)
-    window.addEventListener('resize', medir)
-    return () => {
-      obs.disconnect()
-      window.removeEventListener('resize', medir)
-    }
-  }, [reducir])
-
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ['end end', 'end start'],
-  })
-  const escala = useTransform(scrollYProgress, [0, 1], [1, 0.9])
-  const sombra = useTransform(scrollYProgress, [0, 1], [0, 0.6])
-  const quieta = reducir || ultima
-  const redondo = !primera && 'rounded-t-[2rem] md:rounded-t-[3rem]'
-
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'start 30%'] })
+  const escala = useTransform(scrollYProgress, [0, 1], reducir ? [1, 1] : [0.94, 1])
+  const radio = useTransform(scrollYProgress, [0, 1], reducir ? [40, 40] : [80, 36])
+  const estilo = primera ? undefined : { scale: escala, borderTopLeftRadius: radio, borderTopRightRadius: radio, transformOrigin: '50% 0%' }
   return (
-    <div
+    <motion.div
       ref={ref}
-      className={cn('relative overflow-clip bg-vino-900', redondo, !primera && '-mt-8 md:-mt-12', !primera && 'shadow-[0_-24px_48px_-24px_rgba(46,16,20,.45)]')}
-      style={quieta ? undefined : { position: 'sticky', top: tope }}
+      style={estilo}
+      className={cn(
+        'relative overflow-clip',
+        !primera && '-mt-10 shadow-[0_-24px_48px_-28px_rgba(46,16,20,.4)] md:-mt-12',
+        !ultima && 'pb-10 md:pb-12',
+        className,
+      )}
     >
-      <motion.div style={quieta ? undefined : { scale: escala, transformOrigin: '50% 100%' }} className={cn('relative overflow-clip', redondo, className)}>
-        {children}
-        {!quieta && <motion.div aria-hidden className="pointer-events-none absolute inset-0 z-40 bg-vino-900" style={{ opacity: sombra }} />}
-      </motion.div>
-    </div>
+      {children}
+    </motion.div>
   )
 }
 

@@ -16,6 +16,16 @@ export const NOMBRE_APP = 'Patitas Connect'
 /** El nombre corto: ícono del celular y frases como «Contacto de Patitas». Es la primera palabra del nombre. */
 export const NOMBRE_CORTO = 'Patitas'
 
+/** El lema de la marca (anuncio del equipo, 30 de octubre de 2026). */
+export const LEMA = 'Paseos felices, dueños tranquilos.'
+
+/** Redes oficiales, del anuncio del equipo (30 de octubre de 2026). Los enlaces van sin los códigos de seguimiento del anuncio. */
+export const REDES = [
+  { id: 'instagram', nombre: 'Instagram', usuario: '@patitasconnect', url: 'https://www.instagram.com/patitasconnect' },
+  { id: 'tiktok', nombre: 'TikTok', usuario: '@patitas_connect', url: 'https://www.tiktok.com/@patitas_connect' },
+  { id: 'facebook', nombre: 'Facebook', usuario: NOMBRE_APP, url: 'https://www.facebook.com/profile.php?id=61595715383536' },
+] as const
+
 /** Las dos partes del logotipo: «Patitas» (terracota) y «Connect» (vino). Si el nombre tuviera una sola palabra, la segunda queda vacía. */
 export function partesNombre(nombre: string = NOMBRE_APP): [string, string] {
   const [primera, ...resto] = nombre.trim().split(/\s+/)

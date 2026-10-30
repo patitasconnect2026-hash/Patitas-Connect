@@ -1,15 +1,20 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
 import { motion, useReducedMotion } from 'framer-motion'
 import { NOMBRE_APP } from '@/lib/config'
 import { FOTOS_PERROS, type FotoPerro } from '@/lib/fotosPerros'
+import { cn } from '@/lib/utils'
 
 /* Portada de entrada (como Spaidra): el nombre gigante con la letra del logotipo (Cinzel) y fotos de perros alrededor.
+   Al cargar (como el video de Lightspark): muchas fotos desenfocadas llenan la pantalla, las de sobra se van hacia afuera
+   y las siete del diseño viajan hasta su lugar y se enfocan. Recién entonces aparece el nombre.
    Las fotos nunca pasan por encima de las letras, así el nombre se lee completo.
    Un brillo sigue al mouse por las letras y las fotos se mueven un poco (quieto con «reducir movimiento»). */
 
-type Foto = { f: FotoPerro; x: number; y: number; w: number; h: number; capa: number }
+/** `ix`, `iy`: dónde está el centro de la foto al empezar la intro, antes de acomodarse. */
+type Foto = { f: FotoPerro; x: number; y: number; w: number; h: number; capa: number; ix: number; iy: number }
 type Linea = { texto: string; y: number; letra: number; largo: number; color: string }
 type Diseno = { ancho: number; alto: number; lineas: [Linea, Linea]; fotos: Foto[] }
 
@@ -28,13 +33,13 @@ const COMPUTADORA: Diseno = {
   ],
   // Las fotos van alrededor del nombre, nunca encima de las letras.
   fotos: [
-    { f: 'lab', x: 150, y: 14, w: 156, h: 226, capa: 1 },
-    { f: 'playa', x: 690, y: 8, w: 160, h: 222, capa: 0.6 },
-    { f: 'pelusa', x: 1170, y: 36, w: 290, h: 192, capa: 1.2 },
-    { f: 'corriendo', x: 24, y: 520, w: 258, h: 172, capa: 1.1 },
-    { f: 'beagle', x: 430, y: 690, w: 230, h: 172, capa: 0.8 },
-    { f: 'orejas', x: 960, y: 694, w: 250, h: 166, capa: 1 },
-    { f: 'cachorro', x: 1340, y: 500, w: 160, h: 236, capa: 0.7 },
+    { f: 'lab', x: 150, y: 14, w: 156, h: 226, capa: 1, ix: 620, iy: 380 },
+    { f: 'playa', x: 690, y: 8, w: 160, h: 222, capa: 0.6, ix: 1020, iy: 560 },
+    { f: 'pelusa', x: 1170, y: 36, w: 290, h: 192, capa: 1.2, ix: 360, iy: 250 },
+    { f: 'corriendo', x: 24, y: 520, w: 258, h: 172, capa: 1.1, ix: 1230, iy: 420 },
+    { f: 'beagle', x: 430, y: 690, w: 230, h: 172, capa: 0.8, ix: 800, iy: 300 },
+    { f: 'orejas', x: 960, y: 694, w: 250, h: 166, capa: 1, ix: 420, iy: 640 },
+    { f: 'cachorro', x: 1340, y: 500, w: 160, h: 236, capa: 0.7, ix: 1050, iy: 180 },
   ],
 }
 
@@ -46,13 +51,13 @@ const CELULAR: Diseno = {
     { texto: SEGUNDA, y: 432, letra: 42, largo: 300, ...VINO },
   ],
   fotos: [
-    { f: 'lab', x: 22, y: 24, w: 100, h: 146, capa: 1 },
-    { f: 'playa', x: 150, y: 50, w: 100, h: 146, capa: 0.6 },
-    { f: 'pelusa', x: 272, y: 20, w: 112, h: 76, capa: 1.2 },
-    { f: 'beagle', x: 272, y: 116, w: 112, h: 84, capa: 0.8 },
-    { f: 'cachorro', x: 40, y: 190, w: 76, h: 90, capa: 0.7 },
-    { f: 'corriendo', x: 16, y: 470, w: 160, h: 106, capa: 1.1 },
-    { f: 'orejas', x: 200, y: 500, w: 180, h: 120, capa: 1 },
+    { f: 'lab', x: 22, y: 24, w: 100, h: 146, capa: 1, ix: 260, iy: 330 },
+    { f: 'playa', x: 150, y: 50, w: 100, h: 146, capa: 0.6, ix: 110, iy: 420 },
+    { f: 'pelusa', x: 272, y: 20, w: 112, h: 76, capa: 1.2, ix: 90, iy: 250 },
+    { f: 'beagle', x: 272, y: 116, w: 112, h: 84, capa: 0.8, ix: 200, iy: 560 },
+    { f: 'cachorro', x: 40, y: 190, w: 76, h: 90, capa: 0.7, ix: 300, iy: 470 },
+    { f: 'corriendo', x: 16, y: 470, w: 160, h: 106, capa: 1.1, ix: 250, iy: 150 },
+    { f: 'orejas', x: 200, y: 500, w: 180, h: 120, capa: 1, ix: 140, iy: 330 },
   ],
 }
 
@@ -153,33 +158,108 @@ function Lienzo({ d, id, className }: { d: Diseno; id: string; className?: strin
 
       <circle ref={halo} cx={d.ancho / 2} cy={d.alto / 2} r={d.ancho * 0.3} fill={`url(#${id}-halo)`} />
 
-      {/* 1. Las fotos alrededor del nombre, apareciendo una por una. */}
-      <motion.g initial="oculto" animate="visible" transition={{ staggerChildren: 0.08, delayChildren: 0.3 }}>
-        {fotos(0, `url(#${id}-sombra)`).map((g, i) => (
+      {/* 1. Las fotos empiezan regadas y desenfocadas por toda la pantalla, viajan a su lugar y se enfocan. */}
+      {fotos(0, `url(#${id}-sombra)`).map((g, i) => {
+        const p = d.fotos[i]
+        const dx = p.ix - (p.x + p.w / 2)
+        const dy = p.iy - (p.y + p.h / 2)
+        return (
           <motion.g
             key={i}
-            variants={{ oculto: { opacity: 0, scale: 0.92 }, visible: { opacity: 1, scale: 1 } }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            initial={reducir ? false : { opacity: 0, x: dx, y: dy, scale: 1.25, filter: 'blur(14px)' }}
+            animate={
+              reducir
+                ? undefined
+                : { opacity: [0, 1, 1], x: [dx, dx * 0.88, 0], y: [dy, dy * 0.88, 0], scale: [1.25, 1.15, 1], filter: ['blur(14px)', 'blur(9px)', 'blur(0px)'] }
+            }
+            transition={{ duration: 2.3, times: [0, 0.42, 1], delay: 0.1 + i * 0.06, ease: [0.65, 0, 0.35, 1] }}
             style={{ transformBox: 'fill-box', transformOrigin: 'center' }}
           >
             {g}
           </motion.g>
-        ))}
-      </motion.g>
+        )
+      })}
 
-      {/* 2. El nombre encima de las fotos, con un brillo que sigue al mouse. */}
+      {/* 2. Cuando las fotos ya están en su sitio, aparece el nombre encima, con un brillo que sigue al mouse. */}
       <motion.g
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-        filter={`url(#${id}-sombra)`}
+        initial={reducir ? false : { opacity: 0, y: 40, filter: 'blur(12px)' }}
+        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+        transition={{ duration: 1, delay: 2.45, ease: [0.22, 1, 0.36, 1] }}
       >
-        {d.lineas.map((l) => linea(l, { fill: l.color }))}
+        <g filter={`url(#${id}-sombra)`}>{d.lineas.map((l) => linea(l, { fill: l.color }))}</g>
       </motion.g>
-      <g clipPath={`url(#${id}-letras-0)`}>
+      <motion.g
+        initial={reducir ? false : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8, delay: 3.1 }}
+        clipPath={`url(#${id}-letras-0)`}
+      >
         <circle ref={brillo} cx={d.ancho / 2} cy={d.alto / 2} r={d.ancho * 0.15} fill={`url(#${id}-luz)`} style={{ mixBlendMode: 'screen' }} />
-      </g>
+      </motion.g>
     </svg>
+  )
+}
+
+/** Fotos de sobra para la intro: llenan la pantalla desenfocadas y se van hacia afuera. `solo`: solo en pantallas grandes. */
+const REVUELO = [
+  { f: 'grupo', l: 9, t: 16, s: 10, b: 7, solo: false },
+  { f: 'calle', l: 30, t: 9, s: 8, b: 10, solo: true },
+  { f: 'sendero', l: 52, t: 22, s: 11, b: 6, solo: false },
+  { f: 'abrazo', l: 74, t: 12, s: 9, b: 9, solo: true },
+  { f: 'bosque', l: 92, t: 30, s: 10, b: 7, solo: false },
+  { f: 'correa', l: 18, t: 46, s: 12, b: 8, solo: true },
+  { f: 'cuatro', l: 40, t: 54, s: 9, b: 11, solo: false },
+  { f: 'negro', l: 64, t: 48, s: 12, b: 7, solo: true },
+  { f: 'pradera', l: 84, t: 66, s: 11, b: 9, solo: false },
+  { f: 'cachorro-correa', l: 8, t: 80, s: 10, b: 10, solo: false },
+  { f: 'calle', l: 34, t: 86, s: 9, b: 8, solo: true },
+  { f: 'grupo', l: 58, t: 82, s: 10, b: 11, solo: true },
+]
+
+function Revuelo() {
+  const reducir = useReducedMotion()
+  const [fin, setFin] = useState(false)
+  // Terminada la intro, se quitan del todo para no gastar memoria.
+  useEffect(() => {
+    if (reducir) return
+    const t = setTimeout(() => setFin(true), 3300)
+    return () => clearTimeout(t)
+  }, [reducir])
+  if (reducir || fin) return null
+  return (
+    <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+      {REVUELO.map((r, i) => {
+        const dx = r.l - 50
+        const dy = r.t - 50
+        const n = Math.hypot(dx, dy) || 1
+        return (
+          <motion.div
+            key={i}
+            className={cn('absolute aspect-square w-[clamp(72px,var(--s),190px)]', r.solo && 'hidden md:block')}
+            style={{ left: `${r.l}%`, top: `${r.t}%`, translate: '-50% -50%', '--s': `${r.s}vw` } as React.CSSProperties}
+            initial={{ opacity: 0, scale: 0.6 }}
+            animate={{
+              opacity: [0, 1, 1, 0],
+              scale: [0.6, 1, 1.04, 0.5],
+              x: [0, dx * 0.6, dx * 1.2, (dx / n) * 900],
+              y: [0, dy * 0.6, dy * 1.2, (dy / n) * 700],
+            }}
+            transition={{ duration: 2.9, times: [0, 0.22, 0.55, 1], delay: i * 0.035, ease: 'easeInOut' }}
+          >
+            <Image
+              src={`/fotos/aureola/${r.f}.jpg`}
+              alt=""
+              width={360}
+              height={360}
+              sizes="190px"
+              priority={i < 4}
+              className="h-full w-full rounded-[26%] object-cover shadow-[0_24px_48px_-20px_rgba(91,34,41,.45)]"
+              style={{ filter: `blur(${r.b}px)` }}
+            />
+          </motion.div>
+        )
+      })}
+    </div>
   )
 }
 
@@ -191,14 +271,18 @@ export function Entrada() {
       aria-label={`Bienvenida a ${NOMBRE_APP}`}
       className="relative flex h-[calc(100svh-4rem)] min-h-[560px] flex-col overflow-hidden bg-canvas md:h-[calc(100svh-5rem)]"
     >
+      <Revuelo />
       <div className="relative flex min-h-0 flex-1 items-center justify-center px-2 md:px-6">
         <Lienzo d={CELULAR} id="entrada-cel" className="h-full w-full md:hidden" />
         <Lienzo d={COMPUTADORA} id="entrada-pc" className="hidden h-full w-full md:block" />
       </div>
-      <div className="relative flex flex-col items-center gap-2 px-4 pb-6 pt-2 text-center">
-        <p className="font-display text-[15px] font-bold uppercase tracking-[0.18em] text-ink-soft md:text-[17px]">
-          Paseos con cuidado · San Isidro y Jesús María
-        </p>
+      <motion.div
+        initial={reducir ? false : { opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 2.9 }}
+        className="relative flex flex-col items-center gap-2 px-4 pb-6 pt-2 text-center"
+      >
+        <p className="font-display text-[15px] font-bold uppercase tracking-[0.18em] text-ink-soft md:text-[17px]">Paseos felices · Dueños tranquilos</p>
         <a
           href="#inicio"
           className="inline-flex min-h-11 flex-col items-center justify-center gap-1.5 text-[13px] font-extrabold uppercase tracking-[0.2em] text-brand-700"
@@ -212,7 +296,7 @@ export function Entrada() {
             />
           </span>
         </a>
-      </div>
+      </motion.div>
     </section>
   )
 }
