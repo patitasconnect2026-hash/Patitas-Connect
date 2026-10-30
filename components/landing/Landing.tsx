@@ -138,44 +138,70 @@ const PORTADA: Record<
 
 function Portada({ onEntrar }: { onEntrar: () => void }) {
   const [publico, setPublico] = useState<Publico>('familia')
+  const reducir = useReducedMotion()
   const p = PORTADA[publico]
+  // Manchas de color que flotan muy despacio en el fondo de cada panel.
+  const flotar = (dx: number, dy: number, s: number) =>
+    reducir ? {} : { animate: { x: [0, dx, 0], y: [0, dy, 0] }, transition: { duration: s, repeat: Infinity, ease: 'easeInOut' as const } }
 
   return (
     <section id="inicio" className="relative scroll-mt-16 px-3 pb-20 pt-3 sm:px-4 md:scroll-mt-20 md:pb-28 md:pt-4">
-      {/* Fondo dividido en dos paneles con fotos desenfocadas, como la referencia: claro para el texto, vino para la aureola. */}
+      {/* Fondo dividido en dos paneles, cada uno con su atmósfera: claro y cálido para el texto, vino profundo para la aureola. */}
       <div className="relative mx-auto grid max-w-[1400px] gap-3 md:grid-cols-[1fr_1.05fr]">
         <div className="relative overflow-hidden rounded-[2rem] px-5 py-10 sm:px-8 md:flex md:items-center md:px-12 md:py-16">
-          <div aria-hidden className="absolute inset-0">
-            <Image src="/fotos/perros/lab.jpg" alt="" fill sizes="50vw" className="scale-125 object-cover blur-2xl" />
-            <div className="absolute inset-0 bg-canvas/85" />
+          <div aria-hidden className="absolute inset-0 overflow-hidden bg-[linear-gradient(160deg,#fffaf4_0%,#fbf1e6_55%,#f3e4d2_100%)]">
+            <motion.div {...flotar(40, 30, 16)} className="absolute -left-24 -top-24 h-80 w-80 rounded-full bg-brand-200/55 blur-3xl" />
+            <motion.div {...flotar(-30, -40, 19)} className="absolute -bottom-28 right-[-10%] h-96 w-96 rounded-full bg-vino-100/60 blur-3xl" />
           </div>
           <div className="relative">
-            {/* Pestañas: cada público ve su frase y su botón. */}
-            <div role="tablist" aria-label="¿Quién eres?" className="inline-flex rounded-full bg-paper p-1 ring-1 ring-ink/10">
-              {(Object.keys(PORTADA) as Publico[]).map((k) => (
-                <button
-                  key={k}
-                  type="button"
-                  role="tab"
-                  id={`tab-${k}`}
-                  aria-selected={publico === k}
-                  aria-controls="portada-panel"
-                  onClick={() => setPublico(k)}
-                  className={cn(
-                    'relative min-h-11 rounded-full px-4 text-[14px] font-extrabold transition-colors sm:px-5 sm:text-[15px]',
-                    publico === k ? 'text-white' : 'text-ink-soft hover:text-ink',
-                  )}
-                >
-                  {publico === k && (
-                    <motion.span
-                      layoutId="pestana-activa"
-                      className="absolute inset-0 rounded-full bg-vino"
-                      transition={{ type: 'spring', stiffness: 400, damping: 34 }}
-                    />
-                  )}
-                  <span className="relative">{PORTADA[k].pestana}</span>
-                </button>
-              ))}
+            {/* Pestañas: cada público ve su frase y su botón. Un fondo vino se desliza bajo la elegida. */}
+            <p className="eyebrow text-brand-700">¿Quién eres?</p>
+            <div
+              role="tablist"
+              aria-label="¿Quién eres?"
+              className="mt-3 inline-grid grid-cols-2 gap-1 rounded-[1.4rem] bg-white/80 p-1.5 shadow-[0_14px_34px_-16px_rgba(91,34,41,.45)] ring-1 ring-vino/10 backdrop-blur"
+            >
+              {(Object.keys(PORTADA) as Publico[]).map((k) => {
+                const activa = publico === k
+                const Icono = k === 'familia' ? PawMarkIcon : Bike
+                return (
+                  <button
+                    key={k}
+                    type="button"
+                    role="tab"
+                    id={`tab-${k}`}
+                    aria-selected={activa}
+                    aria-controls="portada-panel"
+                    onClick={() => setPublico(k)}
+                    className={cn(
+                      'group relative flex min-h-14 items-center gap-2.5 rounded-[1.1rem] px-3 py-2 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600 focus-visible:ring-offset-2 sm:px-4',
+                      activa ? 'text-white' : 'text-ink hover:bg-brand-50',
+                    )}
+                  >
+                    {activa && (
+                      <motion.span
+                        layoutId="pestana-activa"
+                        className="absolute inset-0 rounded-[1.1rem] bg-[linear-gradient(135deg,#6b2a31,#4b1b21)] shadow-[0_10px_22px_-10px_rgba(46,16,20,.8)]"
+                        transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+                      />
+                    )}
+                    <span
+                      className={cn(
+                        'relative grid h-9 w-9 shrink-0 place-items-center rounded-full transition-transform duration-300 group-hover:scale-110 max-[399px]:hidden',
+                        activa ? 'bg-white/15 text-brand-200' : 'bg-brand-50 text-brand-700',
+                      )}
+                    >
+                      <Icono size={18} aria-hidden />
+                    </span>
+                    <span className="relative leading-tight">
+                      <span className="block text-[14px] font-extrabold sm:text-[15px]">{PORTADA[k].pestana}</span>
+                      <span className={cn('block text-[13px] font-semibold max-[399px]:hidden', activa ? 'text-white/75' : 'text-ink-soft')}>
+                        {k === 'familia' ? 'Para familias' : 'Para paseadores'}
+                      </span>
+                    </span>
+                  </button>
+                )
+              })}
             </div>
 
             <AnimatePresence mode="wait" initial={false}>
@@ -211,9 +237,9 @@ function Portada({ onEntrar }: { onEntrar: () => void }) {
         </div>
 
         <div className="relative overflow-hidden rounded-[2rem] px-4 py-10 sm:px-10 md:flex md:items-center md:py-14">
-          <div aria-hidden className="absolute inset-0">
-            <Image src="/fotos/perros/playa.jpg" alt="" fill sizes="50vw" className="scale-125 object-cover blur-2xl" />
-            <div className="absolute inset-0 bg-vino-900/75" />
+          <div aria-hidden className="absolute inset-0 overflow-hidden bg-[radial-gradient(120%_90%_at_50%_45%,#6b2a31_0%,#3d161b_55%,#2e1014_100%)]">
+            <motion.div {...flotar(-40, 30, 18)} className="absolute -right-20 -top-20 h-80 w-80 rounded-full bg-brand-600/30 blur-3xl" />
+            <motion.div {...flotar(30, -30, 21)} className="absolute -bottom-24 -left-16 h-80 w-80 rounded-full bg-brand-300/15 blur-3xl" />
           </div>
           <div className="relative w-full">
             <Aureola avisos={p.avisos} clave={publico} />

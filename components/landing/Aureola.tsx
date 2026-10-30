@@ -33,14 +33,17 @@ const FOTOS = [
 // Los tres avisos van en las esquinas, fuera de la corona: así ninguna foto los tapa ni ellos tapan fotos.
 const ESQUINAS = ['left-0 top-[1%]', 'right-0 top-[1%]', 'left-0 bottom-[1%]']
 
-/** Lugares de la corona: una foto cada 10°. Tamaño y giro varían un poco, como un collage. */
-const LUGARES = Array.from({ length: 36 }, (_, i) => i * 10 - 180).map((a, i) => ({
+/** Lugares de la corona: 18 fotos, una cada 20°, con aire entre ellas. Tamaño y giro varían un poco. */
+const LUGARES = Array.from({ length: 18 }, (_, i) => i * 20 - 180).map((a, i) => ({
   a,
   foto: FOTOS[i % FOTOS.length],
-  tam: [11, 9.5, 12, 10][i % 4],
+  tam: [12, 10.5, 11.5][i % 3],
   giro: [-4, 3, -2, 5, 0][i % 5],
-  radio: 34 + [0, 1.5, -1, 0.5][i % 4],
+  radio: 35 + [0, 1, -1][i % 3],
 }))
+
+// Capas apiladas del isotipo: dan grosor de moneda cuando gira (en px, de atrás hacia adelante).
+const GROSOR = Array.from({ length: 13 }, (_, i) => -9 + i * 1.5)
 
 export type AvisoAureola = { icon: typeof Camera; t: string; d: string }
 
@@ -78,56 +81,73 @@ export function Aureola({ avisos, clave }: { avisos: AvisoAureola[]; clave: stri
               className="absolute z-0 hover:z-10"
               style={{ left: `${x}%`, top: `${y}%`, width: `${l.tam}%`, aspectRatio: '1', marginLeft: `${-l.tam / 2}%`, marginTop: `${-l.tam / 2}%` }}
             >
-              <div
-                className="group/foto h-full w-full transition-transform duration-300 ease-out [transform:rotate(var(--r))] motion-safe:hover:[transform:translate(var(--sx),var(--sy))_scale(1.18)]"
-                style={
-                  {
-                    '--r': `${l.giro}deg`,
-                    '--sx': `${(Math.cos(rad) * 14).toFixed(1)}px`,
-                    '--sy': `${(Math.sin(rad) * 14).toFixed(1)}px`,
-                  } as React.CSSProperties
-                }
+              <motion.div
+                className="h-full w-full"
+                animate={reducir ? undefined : { y: [0, -5, 0] }}
+                transition={{ duration: 4 + (i % 3), repeat: Infinity, ease: 'easeInOut', delay: i * 0.25 }}
               >
-                <Image
-                  src={`/fotos/aureola/${l.foto}.jpg`}
-                  alt=""
-                  width={360}
-                  height={360}
-                  sizes="(min-width: 768px) 80px, 14vw"
-                  className="h-full w-full rounded-md object-cover shadow-[0_10px_24px_-10px_rgba(0,0,0,.6)] ring-2 ring-white/80 transition-shadow duration-300 group-hover/foto:shadow-[0_22px_36px_-12px_rgba(0,0,0,.75)]"
-                />
-              </div>
+                <div
+                  className="group/foto h-full w-full transition-transform duration-300 ease-out [transform:rotate(var(--r))] motion-safe:hover:[transform:translate(var(--sx),var(--sy))_scale(1.18)]"
+                  style={
+                    {
+                      '--r': `${l.giro}deg`,
+                      '--sx': `${(Math.cos(rad) * 14).toFixed(1)}px`,
+                      '--sy': `${(Math.sin(rad) * 14).toFixed(1)}px`,
+                    } as React.CSSProperties
+                  }
+                >
+                  <Image
+                    src={`/fotos/aureola/${l.foto}.jpg`}
+                    alt=""
+                    width={360}
+                    height={360}
+                    sizes="(min-width: 768px) 80px, 14vw"
+                    className="h-full w-full rounded-xl object-cover shadow-[0_10px_24px_-10px_rgba(0,0,0,.6)] ring-2 ring-white/85 transition-shadow duration-300 group-hover/foto:shadow-[0_22px_36px_-12px_rgba(0,0,0,.75)]"
+                  />
+                </div>
+              </motion.div>
             </motion.div>
           )
         })}
 
-        {/* El isotipo al centro, girando sobre su eje como una moneda. */}
-        <div className="absolute inset-[31%] z-20 [perspective:900px]">
+        {/* El isotipo al centro, en 3D: capas apiladas le dan grosor y gira despacio sobre su eje, como una moneda. */}
+        <div aria-hidden className="absolute inset-[24%] rounded-full bg-[radial-gradient(circle,rgba(233,150,114,.45),rgba(233,150,114,0)_68%)]" />
+        <motion.div
+          className="absolute inset-[30%] z-20 [perspective:1100px]"
+          animate={reducir ? undefined : { y: [0, -8, 0] }}
+          transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+        >
           <motion.div
             className="relative h-full w-full [transform-style:preserve-3d]"
+            style={{ rotateX: 8 }}
             animate={reducir ? undefined : { rotateY: 360 }}
-            transition={{ duration: 9, repeat: Infinity, ease: 'linear' }}
+            transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
           >
-            {[0, 180].map((cara) => (
-              <div
-                key={cara}
-                className="absolute inset-0 grid place-items-center rounded-full bg-brand-50 shadow-[0_24px_50px_-20px_rgba(0,0,0,.6)] ring-4 ring-brand-200/70 [backface-visibility:hidden]"
-                style={{ transform: `rotateY(${cara}deg)` }}
-              >
+            {GROSOR.map((z, k) => {
+              const frente = k === GROSOR.length - 1
+              const atras = k === 0
+              return (
                 <Image
+                  key={z}
                   src="/marca/logo-mark.png"
-                  alt={cara === 0 ? `Isotipo de ${NOMBRE_APP}: un perro abrazando a su cachorro` : ''}
-                  aria-hidden={cara !== 0}
+                  alt={frente ? `Isotipo de ${NOMBRE_APP}: un perro abrazando a su cachorro` : ''}
+                  aria-hidden={!frente}
                   width={482}
                   height={512}
-                  priority
+                  priority={frente}
                   sizes="(min-width: 768px) 220px, 40vw"
-                  className="h-[70%] w-auto object-contain"
+                  className={cn('absolute inset-0 h-full w-full object-contain', (frente || atras) && '[backface-visibility:hidden]')}
+                  style={{
+                    transform: atras ? `translateZ(${z}px) rotateY(180deg)` : `translateZ(${z}px)`,
+                    filter: frente || atras ? 'drop-shadow(0 18px 24px rgba(0,0,0,.35))' : 'brightness(.55) saturate(1.2)',
+                  }}
                 />
-              </div>
-            ))}
+              )
+            })}
           </motion.div>
-        </div>
+        </motion.div>
+        {/* Sombra en el «piso», debajo del isotipo. */}
+        <div aria-hidden className="absolute bottom-[25%] left-1/2 h-[4%] w-[26%] -translate-x-1/2 rounded-[50%] bg-black/35 blur-md" />
 
         {/* Los tres avisos, encima de todo, en las esquinas (desde tablet). */}
         <AnimatePresence mode="wait" initial={false}>
