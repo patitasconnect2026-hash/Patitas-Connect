@@ -10,6 +10,7 @@ import type { Dog, FurKey, Size } from '@/lib/types'
 import { inputBase } from '@/lib/ui'
 import { cn, plural } from '@/lib/utils'
 import { DogAvatar } from './ui/Dog'
+import { FichaCuidado } from './funciones/FichaCuidado'
 
 const SIZES: Size[] = ['small', 'medium', 'large']
 
@@ -300,6 +301,7 @@ export function DogForm({ dog, onChange }: { dog: Dog; onChange: (d: Dog) => voi
                   <input value={dog.vet} onChange={(e) => set({ vet: e.target.value })} className={inputBase} placeholder="Nombre" />
                 </label>
               </div>
+              <FichaCuidado dog={dog} onChange={set} />
             </div>
           </motion.div>
         )}

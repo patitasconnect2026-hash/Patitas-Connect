@@ -693,6 +693,17 @@ export function guardarRecordados(s: ReadonlySet<string>): void {
   adaptador.guardar(CLAVES.recordados, [...s].slice(-200))
 }
 
+/**
+ * Datos sueltos que solo viven en este teléfono (calificaciones por barras, preferencias de avisos, academia). Leer
+ * devuelve `porDefecto` si no hay nada o está dañado; guardar nunca revienta.
+ */
+export function leerDelTelefono<T>(clave: (typeof CLAVES)['calificaciones' | 'avisosPreferencias' | 'academia'], porDefecto: T): T {
+  return adaptador.leer<T>(clave, porDefecto)
+}
+export function guardarEnTelefono<T>(clave: (typeof CLAVES)['calificaciones' | 'avisosPreferencias' | 'academia'], valor: T): void {
+  adaptador.guardar(clave, valor)
+}
+
 /** Para la app del cliente: anota que abrió la hoja del DNI de un paseador. */
 export function useRegistrarVistaDni(): (walkerId: string) => void {
   return useCallback((walkerId: string) => registrarVistaDni(adaptador, walkerId), [])

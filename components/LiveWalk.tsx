@@ -53,6 +53,8 @@ import { SelfieEnPaseo } from './SelfieDelDia'
 import type { Walker } from '@/lib/types'
 import { posicionesDe, puntosDeDemostracion, puntosDelPaseo, ultimoControl, type PuntoControl } from '@/lib/puntosControl'
 import { clockAt } from '@/lib/walk'
+import type { Lectura as LecturaSenal } from '@/lib/protocoloSenal'
+import { PanelSenal } from './funciones/PanelSenal'
 import { EtiquetaEjemplo } from './ui/EtiquetaEjemplo'
 import { Seal, SelloPaseador } from './ui/Logo'
 import { PortraitAvatar } from './ui/PortraitAvatar'
@@ -254,6 +256,8 @@ export function LiveWalk({
   puedeSimular = true,
   conServidor = false,
   enVivo = null,
+  distrito = null,
+  onCalificarPorPartes,
 }: {
   walk: Walk | null
   entries: TimelineEntry[]
@@ -316,6 +320,10 @@ export function LiveWalk({
   conServidor?: boolean
   /** Con servidor y solo mientras pasea: la última ubicación en vivo del paseador (con la app abierta). */
   enVivo?: { pos: [number, number]; reciente: boolean; haceSegundos: number | null } | null
+  /** Distrito de la casa (para el serenazgo del protocolo de señal). */
+  distrito?: string | null
+  /** Abre la calificación por partes (barras y puntaje final del 1 al 10). */
+  onCalificarPorPartes?: () => void
 }) {
   // Los puntos de control: los reales (inicio, fotos y fin) o, en la demostración, los inventados por el guion.
   const empezoGuion = !!walk && (estado === null ? true : estado === 'en_paseo' || estado === 'entregado' || estado === 'cerrado' || estado === 'en_disputa')
@@ -332,6 +340,12 @@ export function LiveWalk({
     return puntosDelPaseo(puntos, fotos)
   }, [simulado, walk, entries, empezoGuion, puntos, fotos])
   const puntosMapa = useMemo(() => posicionesDe(listaPuntos), [listaPuntos])
+  // Lecturas para el protocolo de señal: la ubicación en vivo (servidor) o, sin ella, la de cada punto de control.
+  const lecturasSenal = useMemo<LecturaSenal[]>(() => {
+    if (enVivo && ahora) return [{ lat: enVivo.pos[0], lng: enVivo.pos[1], en: ahora - (enVivo.haceSegundos ?? 0) * 1000 }]
+    // En la demostración la hora de los puntos es la del guion: se toman como recientes.
+    return listaPuntos.filter((p) => p.ubicacion).map((p) => ({ lat: p.ubicacion!.pos[0], lng: p.ubicacion!.pos[1], en: simulado ? ahora : p.t }))
+  }, [enVivo, ahora, listaPuntos, simulado])
 
   // Al tocar «Recibí a [perro]» la pantalla baja sola hasta «Paga a Patitas» (solo ese momento: no cada vez que cambia algo).
   const bloquePago = useRef<HTMLDivElement>(null)
@@ -418,6 +432,17 @@ export function LiveWalk({
         </div>
 
         {conServidor && e === 'en_paseo' && <EnVivoDelPaseo enVivo={enVivo} />}
+        {e === 'en_paseo' && ahora > 0 && (
+          <PanelSenal
+            lecturas={lecturasSenal}
+            ahora={ahora}
+            modo={enVivo ? 'en_vivo' : 'puntos'}
+            perro={b.dog.name}
+            paseador={b.walker.firstName}
+            distrito={distrito}
+            onChat={onOpenChat}
+          />
+        )}
         {paseo && (
           <AvisosPaseo paseo={paseo} vista="dueno" conServidor={conServidor} onProbar={e === 'en_paseo' ? onProbarAvisos : undefined} className="mb-3" />
         )}
@@ -558,6 +583,11 @@ export function LiveWalk({
         {completed && (
           <div className="mt-4">
             <CompletedCard walk={walk} reviewed={reviewed} porEquipo={cierreDelEquipo} onRebook={onRebook} onWriteReview={onWriteReview} />
+            {onCalificarPorPartes && (
+              <button type="button" onClick={onCalificarPorPartes} className="min-h-11 mt-3 w-full rounded-2xl border border-ink/15 bg-paper px-3 py-2.5 text-[14px] font-extrabold text-ink active:scale-[0.98]">
+                Calificar por partes y del 1 al 10
+              </button>
+            )}
           </div>
         )}
 

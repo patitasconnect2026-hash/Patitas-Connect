@@ -22,7 +22,8 @@ import { VerMas } from '../ui/VerMas'
 import { reglaNuevoPaseador, reglaPrimerPaseoPaseador } from '@/lib/verificacion'
 
 const DEMO_CODE = '482913'
-const TOTAL = 7
+// Eran 7: la autorización de consultas ahora va junto a los acuerdos (pedido de Yahrod, 30 de octubre de 2026).
+const TOTAL = 6
 
 function formatPhone(v: string) {
   const d = v.replace(/\D/g, '').slice(0, 9)
@@ -36,13 +37,12 @@ const slide = { initial: { opacity: 0, x: 28 }, animate: { opacity: 1, x: 0 }, e
 export function firstOpenStep(a: WalkerApplication): number {
   const termsOk = WALKER_BLOCKS.every((b) => a.consent[b.id])
   if (!a.phone) return 1
-  if (!termsOk) return 2
+  if (!termsOk || !a.consults.consent) return 2
   if (!a.person.dni) return 3
   if (!profileValid(a)) return 4
   if (!a.curso?.aprobado) return 5
   if (!a.quiz || a.quiz.verdict === 'fail') return 5
-  if (!a.consults.consent) return 6
-  return 7
+  return 6
 }
 
 /**
@@ -120,7 +120,7 @@ export function WalkerOnboarding({
   const dniOk = /^\d{8}$/.test(p.dni)
   const dataOk = !!(p.firstName.trim() && p.lastName.trim() && dniOk && age >= 18 && p.university && p.career.trim() && app.photo)
   const consentOk = app.consults.consent
-  const paso6Ok = consentOk
+  const paso2Ok = termsOk && consentOk
   const cursoOk = !!app.curso?.aprobado
   // El resultado del curso se ve antes de pasar al examen (si ya lo había aprobado al volver, sigue de largo).
   const [cursoListo, setCursoListo] = useState(() => !!app.curso?.aprobado)
@@ -228,6 +228,22 @@ export function WalkerOnboarding({
                 </p>
               </div>
               <TermsBlocks blocks={bloquesParaMostrar(WALKER_BLOCKS, !!cuenta)} value={app.consent} onChange={(v) => onChange((a) => ({ ...a, consent: v }))} />
+              <div className="space-y-2 rounded-2xl bg-sand p-3.5">
+                <p className="text-[14px] font-extrabold text-ink">Verificación en vivo</p>
+                <p className="text-[14px] leading-snug text-ink-soft">Hacemos las consultas oficiales contigo, por WhatsApp.</p>
+                <VerMas>No subes capturas ni documentos. Ten tu DNI a la mano. El equipo te escribe para coordinar el horario (llamada o videollamada).</VerMas>
+                <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-ink/15 bg-paper p-3.5">
+                  <input
+                    type="checkbox"
+                    checked={consentOk}
+                    onChange={(e) => onChange((a) => ({ ...a, consults: { ...a.consults, consent: e.target.checked } }))}
+                    className="mt-0.5 h-5 w-5 shrink-0 accent-brand-600"
+                  />
+                  <span className="text-[14px] font-semibold leading-snug text-ink">
+                    Autorizo a {NOMBRE_APP} a consultar registros oficiales con mi DNI, en vivo por WhatsApp, solo para decidir mi ingreso.
+                  </span>
+                </label>
+              </div>
             </motion.div>
           )}
 
@@ -362,31 +378,9 @@ export function WalkerOnboarding({
           )}
 
           {step === 6 && (
-            <motion.div key="s6" {...slide} className="space-y-5">
+            <motion.div key="s6" {...slide} className="space-y-4">
               <div>
                 <p className="eyebrow text-brand-700">Paso 6 de {TOTAL}</p>
-                <h2 className="font-display text-[34px] font-bold leading-[1.05] text-ink">Verificación en vivo</h2>
-                <p className="mt-2 text-[14px] leading-relaxed text-ink-soft">Las consultas oficiales las hacemos contigo, en vivo, por WhatsApp (llamada o videollamada, como te quede mejor).</p>
-                <VerMas>No subes capturas ni documentos. Ten tu DNI a la mano. El equipo te escribe para coordinar el horario.</VerMas>
-              </div>
-              <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-ink/15 p-3.5">
-                <input
-                  type="checkbox"
-                  checked={consentOk}
-                  onChange={(e) => onChange((a) => ({ ...a, consults: { ...a.consults, consent: e.target.checked } }))}
-                  className="mt-0.5 h-5 w-5 shrink-0 accent-brand-600"
-                />
-                <span className="text-[14px] font-semibold leading-snug text-ink">
-                  Autorizo a {NOMBRE_APP} a consultar registros oficiales con mi DNI, en vivo por WhatsApp, solo para decidir mi ingreso.
-                </span>
-              </label>
-            </motion.div>
-          )}
-
-          {step === 7 && (
-            <motion.div key="s7" {...slide} className="space-y-4">
-              <div>
-                <p className="eyebrow text-brand-700">Paso 7 de {TOTAL}</p>
                 <h2 className="font-display text-[34px] font-bold leading-[1.05] text-ink">Revisa y envía</h2>
               </div>
               <ul className="space-y-2">
@@ -435,8 +429,8 @@ export function WalkerOnboarding({
           </button>
         )}
         {step === 2 && (
-          <button type="button" disabled={!termsOk} onClick={acceptTerms} className={cn(btnPrimary, 'h-14 w-full text-[16px]', off)}>
-            {termsOk ? 'Acepto y continúo' : `Acepta los ${WALKER_BLOCKS.length} acuerdos para seguir`} {termsOk && <ArrowRight size={19} strokeWidth={2.6} />}
+          <button type="button" disabled={!paso2Ok} onClick={acceptTerms} className={cn(btnPrimary, 'h-14 w-full text-[16px]', off)}>
+            {paso2Ok ? 'Acepto y continúo' : termsOk ? 'Marca la autorización' : `Acepta los ${WALKER_BLOCKS.length} acuerdos para seguir`} {paso2Ok && <ArrowRight size={19} strokeWidth={2.6} />}
           </button>
         )}
         {step === 3 && (
@@ -450,12 +444,7 @@ export function WalkerOnboarding({
           </button>
         )}
         {step === 6 && (
-          <button type="button" disabled={!paso6Ok} onClick={() => setStep(7)} className={cn(btnPrimary, 'h-14 w-full text-[16px]', off)}>
-            {paso6Ok ? 'Continuar' : 'Marca la autorización'} {paso6Ok && <ArrowRight size={19} strokeWidth={2.6} />}
-          </button>
-        )}
-        {step === 7 && (
-          <button type="button" disabled={!(termsOk && dataOk && profileValid(app) && quizOk && paso6Ok)} onClick={submit} className={cn(btnInk, 'h-14 w-full text-[16px]', off)}>
+          <button type="button" disabled={!(paso2Ok && dataOk && profileValid(app) && quizOk)} onClick={submit} className={cn(btnInk, 'h-14 w-full text-[16px]', off)}>
             Enviar mi postulación <ArrowRight size={19} strokeWidth={2.6} />
           </button>
         )}

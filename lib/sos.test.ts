@@ -190,9 +190,11 @@ describe('serenazgoSos', () => {
     expect(f.llamar).toBe('tel:+51987654321')
     expect(f.whatsapp).toBeNull()
   })
-  it('el serenazgo real de la config empieza vacío (no se inventan números)', () => {
-    expect(CONFIG.serenazgo.sanIsidro).toEqual({ telefono: '', whatsapp: '' })
-    expect(CONFIG.serenazgo.jesusMaria).toEqual({ telefono: '', whatsapp: '' })
+  // Antes estaba vacío. El 30 de octubre de 2026 se copiaron las centrales de las páginas oficiales (gob.pe y
+  // munijesusmaria.gob.pe; ver lib/config.ts). Si alguien cambia un número, que sea a propósito y con su fuente.
+  it('el serenazgo real de la config es el de la fuente oficial (no se inventan números)', () => {
+    expect(CONFIG.serenazgo.sanIsidro).toEqual({ telefono: '(01) 319 0450', whatsapp: '' })
+    expect(CONFIG.serenazgo.jesusMaria).toEqual({ telefono: '(01) 634 0100', whatsapp: '' })
   })
 })
 

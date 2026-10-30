@@ -12,6 +12,8 @@ import { TEXTO_ALGO_PASA } from '@/lib/equipoTextos'
 import { COMPROBACIONES, MAX_PERROS_POR_PASEO, REGLA_NUEVO, reglaNuevoDueno, textoCantidadComprobaciones } from '@/lib/verificacion'
 import { Seal } from './ui/Logo'
 import { VerMas } from './ui/VerMas'
+import { Protocolos } from './funciones/Protocolos'
+import { DistritosSerenazgo } from './funciones/Distritos'
 
 const RULES = [
   { n: String(MAX_PERROS_POR_PASEO), title: 'perros como máximo', text: 'Nunca más. Con menos perros, más atención a cada uno.' },
@@ -23,7 +25,7 @@ const RULES = [
 const FAQ: Array<{ q: string; a: string; mas?: string }> = [
   {
     q: '¿Cuándo se paga?',
-    a: 'Antes del paseo: pagas y el equipo lo verifica a mano.',
+    a: TEXTOS_PAGO.honestidad,
     mas: masPagoDueno(),
   },
   {
@@ -193,6 +195,22 @@ export function SafetyView({ onExplore, onApply, onAlgoPasa, onQuienesSomos }: {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="mt-9 px-4">
+        <div className="px-1">
+          <p className="eyebrow text-brand-700">Si algo sale mal</p>
+          <h2 className="font-display text-[28px] font-bold leading-tight text-ink">Qué pasa si…</h2>
+        </div>
+        <Protocolos className="mt-4" />
+      </section>
+
+      <section className="mt-9 px-4">
+        <div className="px-1">
+          <p className="eyebrow text-brand-700">Serenazgo</p>
+          <h2 className="font-display text-[28px] font-bold leading-tight text-ink">Llama con un toque</h2>
+        </div>
+        <DistritosSerenazgo soloActivos className="mt-4" />
       </section>
 
       <section className="mt-9 px-4">

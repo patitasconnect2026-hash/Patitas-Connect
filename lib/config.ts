@@ -302,6 +302,37 @@ export interface Config {
    * Vacío = no se muestra.
    */
   emergenciasNacionales: { policia: string; bomberos: string; samu: string }
+
+  // ---- PLANES, NIVELES Y PROMOCIONES (pedido de Yahrod, 30 de octubre de 2026). PROVISIONAL Y SIMULADO ----
+  /**
+   * Comisión según el nivel del paseador (en %): quien trabaja mejor se queda con más. La lógica está en lib/planes.ts.
+   * SIMULADO: el cobro real sigue usando `comision` hasta que el equipo ponga `comisionPorNivelActiva` en true.
+   */
+  comisionPorNivel: { nuevo: number; pro: number; elite: number }
+  comisionPorNivelActiva: boolean
+  /** Membresías de las familias: precio al mes en soles (0 = gratis). Beneficios y límites en lib/planes.ts. */
+  precioPlanFamilia: { gratis: number; plus: number; club: number }
+  /** Descuento por paseo del plan Club (en %) y el tope de ese descuento al mes (soles): así el plan nunca da pérdida. */
+  descuentoClubPct: number
+  topeDescuentoClubMes: number
+  /** «Destacado»: el paseador Pro o Élite sale primero en su distrito, marcado como «Destacado». Soles al mes. */
+  precioDestacadoMes: number
+  /** ¿Ya se cobran las membresías? Mientras sea false, la web las muestra como «Se activan al empezar a cobrar». */
+  planesActivos: boolean
+  /** Promociones. Cada una está apagada hasta que se cobre de verdad; el descuento nunca pasa la comisión del paseo. */
+  promoPrimerPaseoPct: number
+  promoPrimerPaseoTope: number
+  promoInvitaFamilia: number
+  /** Paseadores que llegan con su grupo: comisión de Pro durante estos días, si entran al menos `minimoGrupo`. */
+  diasPromoGrupo: number
+  minimoGrupo: number
+  /** Bono que Patitas suma (de su comisión) al paseo que se relanza cuando un paseador cancela. Plus y Club reciben el mayor. */
+  bonoRescate: number
+  bonoRescatePlan: number
+  /** Fondo de cuidado: lo aparta Patitas de su comisión en cada paseo y ayuda a pagar la veterinaria de un accidente sin culpa. */
+  fondoCuidado: { aportePorPaseo: number; topePorCaso: number; horasParaReportar: number }
+  /** SEÑAL DEL PASEO: minutos sin ubicación para cada escalón del protocolo (lib/protocoloSenal.ts). */
+  senal: { minutosDebil: number; minutosPerdida: number; minutosLlamada: number; minutosAlerta: number; velocidadVehiculoKmh: number; bateriaMinimaPct: number }
 }
 
 export const CONFIG: Config = {
@@ -377,11 +408,31 @@ export const CONFIG: Config = {
   ],
   contactosAyuda: [],
   horarioAyuda: '',
+  // Copiados de las páginas oficiales el 30 de octubre de 2026 (fuentes en lib/distritos.ts). FALTA que el equipo los
+  // confirme llamando (docs/AVANCE.md). San Isidro: gob.pe «Teléfonos de emergencia de San Isidro». Jesús María:
+  // munijesusmaria.gob.pe «Teléfonos de emergencia» (Central de Comunicaciones).
   serenazgo: {
-    sanIsidro: { telefono: '', whatsapp: '' },
-    jesusMaria: { telefono: '', whatsapp: '' },
+    sanIsidro: { telefono: '(01) 319 0450', whatsapp: '' },
+    jesusMaria: { telefono: '(01) 634 0100', whatsapp: '' },
   },
   emergenciasNacionales: { policia: '105', bomberos: '116', samu: '106' },
+  // PROVISIONAL Y SIMULADO (pedido del 30 de octubre): nada de esto se cobra hasta que haya empresa, RUC y contador.
+  comisionPorNivel: { nuevo: 20, pro: 15, elite: 10 },
+  comisionPorNivelActiva: false,
+  precioPlanFamilia: { gratis: 0, plus: 19.9, club: 49.9 },
+  descuentoClubPct: 5,
+  topeDescuentoClubMes: 25,
+  precioDestacadoMes: 14.9,
+  planesActivos: false,
+  promoPrimerPaseoPct: 20,
+  promoPrimerPaseoTope: 6,
+  promoInvitaFamilia: 5,
+  diasPromoGrupo: 60,
+  minimoGrupo: 3,
+  bonoRescate: 3,
+  bonoRescatePlan: 5,
+  fondoCuidado: { aportePorPaseo: 1, topePorCaso: 300, horasParaReportar: 24 },
+  senal: { minutosDebil: 3, minutosPerdida: 6, minutosLlamada: 12, minutosAlerta: 20, velocidadVehiculoKmh: 20, bateriaMinimaPct: 40 },
 }
 
 /* ------------------------------------------------------------------ */

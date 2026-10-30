@@ -232,3 +232,37 @@ button:disabled {
   animation-direction: reverse;
   animation-duration: 55s;
 }
+
+/* Deslizador de las calificaciones por barras (components/funciones/Barras.tsx): pista gruesa y botón de 28 px. */
+.barra-deslizador::-webkit-slider-runnable-track {
+  height: 12px;
+  border-radius: 999px;
+  background: linear-gradient(to right, var(--color-brand-700) var(--relleno, 50%), rgb(20 8 9 / 0.1) var(--relleno, 50%));
+}
+.barra-deslizador::-moz-range-track {
+  height: 12px;
+  border-radius: 999px;
+  background: linear-gradient(to right, var(--color-brand-700) var(--relleno, 50%), rgb(20 8 9 / 0.1) var(--relleno, 50%));
+}
+.barra-deslizador::-webkit-slider-thumb {
+  appearance: none;
+  margin-top: -8px;
+  height: 28px;
+  width: 28px;
+  border-radius: 999px;
+  background: var(--color-paper);
+  border: 3px solid var(--color-brand-700);
+  box-shadow: 0 2px 6px rgb(20 8 9 / 0.25);
+}
+.barra-deslizador::-moz-range-thumb {
+  height: 22px;
+  width: 22px;
+  border-radius: 999px;
+  background: var(--color-paper);
+  border: 3px solid var(--color-brand-700);
+}
+.barra-deslizador:focus-visible {
+  outline: 3px solid var(--color-brand-600);
+  outline-offset: 2px;
+  border-radius: 12px;
+}

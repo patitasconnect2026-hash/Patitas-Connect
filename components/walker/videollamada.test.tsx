@@ -40,9 +40,10 @@ function enElPaso6(extra: Partial<WalkerApplication> = {}): WalkerApplication {
 const pintar = (app: WalkerApplication) => renderToStaticMarkup(createElement(WalkerOnboarding, { app, onChange: () => undefined, onSubmit: () => undefined, onExit: () => undefined }))
 
 describe('el paso de verificación en vivo: ya no se agenda un horario', () => {
-  it('la postulación llega al paso 6 y se detiene ahí hasta dar la autorización (no hace falta elegir hora)', () => {
-    expect(firstOpenStep(enElPaso6())).toBe(6)
-    expect(firstOpenStep(enElPaso6({ consults: { consent: true } }))).toBe(7)
+  // Desde el 30 de octubre de 2026 la autorización va en el paso 2, junto a los acuerdos (6 pasos en vez de 7).
+  it('sin la autorización la postulación vuelve al paso 2 (acuerdos) y no hace falta elegir hora', () => {
+    expect(firstOpenStep(enElPaso6())).toBe(2)
+    expect(firstOpenStep(enElPaso6({ consults: { consent: true } }))).toBe(6)
     expect(postulacionCompleta(enElPaso6({ consults: { consent: true } }))).toBe(true)
   })
 
@@ -62,7 +63,7 @@ describe('el paso de verificación en vivo: ya no se agenda un horario', () => {
 
   it('con la autorización marcada basta para continuar: ya no hay referencias que completar o borrar', () => {
     const h = pintar(enElPaso6({ consults: { consent: true } }))
-    // Se abre en el paso 7 («Revisa y envía»): la lista no menciona referencias ni un horario de videollamada.
+    // Se abre en el paso 6 («Revisa y envía»): la lista no menciona referencias ni un horario de videollamada.
     expect(h).toContain('Revisa y envía')
     expect(h).not.toMatch(/Videollamada ·/)
     expect(h).not.toMatch(/Referencias|referencia/)

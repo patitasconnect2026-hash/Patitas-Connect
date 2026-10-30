@@ -22,7 +22,8 @@ import {
   Wallet,
   X,
 } from 'lucide-react'
-import { CONFIG, LEMA, NOMBRE_APP, NOMBRE_CORTO, TEXTOS_PAGO, textoPlanLunesViernes } from '@/lib/config'
+import { CONFIG, contactoPrincipal, LEMA, NOMBRE_APP, NOMBRE_CORTO, TEXTOS_PAGO, textoPlanLunesViernes } from '@/lib/config'
+import { enlaceWhatsApp } from '@/lib/telefono'
 import { DURATIONS } from '@/lib/data'
 import { FOTOS_PERROS } from '@/lib/fotosPerros'
 import { COMPROBACIONES, MAX_PERROS_POR_PASEO, REGLA_NUEVO, textoHastaComprobaciones } from '@/lib/verificacion'
@@ -46,6 +47,10 @@ import {
 import { PawPattern } from '../Onboarding'
 import { Entrada } from './Entrada'
 import { Aureola } from './Aureola'
+import { DistritosSerenazgo } from '../funciones/Distritos'
+import { NivelesPaseador, PlanesFamilia } from '../funciones/Planes'
+import { Protocolos } from '../funciones/Protocolos'
+import { ACADEMIA, BENEFICIOS_ALIADO, SERVICIOS } from '@/lib/servicios'
 
 /** Textos de la portada pública. Todo lo que se promete aquí existe en la app (ver la skill patitas-connect, sección 6). */
 export const TEXTO_PORTADA = {
@@ -62,6 +67,7 @@ const NAV = [
   { href: '#familias', t: 'Para familias' },
   { href: '#paseadores', t: 'Para paseadores' },
   { href: '#como-funciona', t: 'Cómo funciona' },
+  { href: '#planes', t: 'Planes' },
   { href: '#app', t: 'App' },
   { href: '#preguntas', t: 'Preguntas' },
 ]
@@ -1304,6 +1310,98 @@ function Pie({ onEntrar }: { onEntrar: () => void }) {
 }
 
 /** Portada pública (la web de la marca). «Entrar» o «Buscar paseador» abre la app de la familia; «Postular» lleva a /paseador. */
+/** Membresías de las familias y niveles del paseador (lib/planes.ts). Mientras no se cobre, lo dicen las tarjetas. */
+function Planes() {
+  return (
+    <Seccion id="planes" className="bg-paper">
+      <Titulo eyebrow="Planes">Gratis para empezar.</Titulo>
+      <motion.p {...aparecer} className="mt-4 max-w-xl text-[17px] leading-relaxed text-ink-soft">
+        Más reservas y prioridad si pasea seguido.
+      </motion.p>
+      <PlanesFamilia className="mt-8" />
+    </Seccion>
+  )
+}
+
+/** Para paseadores: niveles con menos comisión, academia y grupos que entran juntos. */
+function Profesionales() {
+  return (
+    <Seccion id="niveles" className="bg-vino">
+      <Titulo eyebrow="Paseadores" claro>
+        Sube de nivel, paga menos.
+      </Titulo>
+      <motion.p {...aparecer} className="mt-4 max-w-xl text-[17px] leading-relaxed text-white/80">
+        Postulas en minutos. Tu grupo entra junto.
+      </motion.p>
+      <NivelesPaseador claro className="mt-8" />
+      <motion.div {...aparecer} className="mt-8 rounded-3xl bg-white/10 p-5 ring-1 ring-white/15">
+        <p className="eyebrow text-brand-200">Academia</p>
+        <ul className="mt-3 flex flex-wrap gap-2">
+          {ACADEMIA.map((c) => (
+            <li key={c.id} className="rounded-full bg-white/10 px-3 py-1.5 text-[14px] font-bold text-white">
+              {c.nombre} · {c.minutos} min
+            </li>
+          ))}
+        </ul>
+      </motion.div>
+    </Seccion>
+  )
+}
+
+/** Qué pasa si se pierde el GPS, se apaga el celular, cancelan o el perro se enferma. */
+function SiAlgoSaleMal() {
+  return (
+    <Seccion id="protocolos" className="bg-canvas">
+      <Titulo eyebrow="Reglas claras">Si algo sale mal.</Titulo>
+      <motion.p {...aparecer} className="mt-4 max-w-xl text-[17px] leading-relaxed text-ink-soft">
+        Cada caso tiene pasos y alguien responsable.
+      </motion.p>
+      <Protocolos className="mt-8" />
+    </Seccion>
+  )
+}
+
+/** Servicios (hoy y pronto), veterinarias que quieran sumarse y distritos con su serenazgo. */
+function Servicios() {
+  const ayuda = contactoPrincipal()
+  const aliada = ayuda ? enlaceWhatsApp(ayuda.whatsapp || ayuda.telefono, `Hola, tengo una veterinaria y quiero ser aliada de ${NOMBRE_CORTO}.`) : null
+  return (
+    <Seccion id="servicios" className="bg-paper">
+      <Titulo eyebrow="Servicios y distritos">Hoy paseos. Pronto más.</Titulo>
+      <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {SERVICIOS.map((sv) => (
+          <motion.li key={sv.id} {...aparecer} className="rounded-3xl border border-ink/10 bg-canvas p-5">
+            <p className="flex items-center justify-between gap-2">
+              <span className="font-display text-[20px] font-bold text-ink">{sv.nombre}</span>
+              <span className={cn('rounded-full px-2.5 py-0.5 text-[12px] font-extrabold', sv.estado === 'activo' ? 'bg-forest text-white' : 'bg-sand text-ink')}>
+                {sv.estado === 'activo' ? 'Hoy' : 'Pronto'}
+              </span>
+            </p>
+            <p className="mt-1.5 text-[15px] leading-snug text-ink-soft">{sv.detalle}</p>
+          </motion.li>
+        ))}
+      </ul>
+      <motion.div {...aparecer} className="mt-6 rounded-3xl bg-sand p-5">
+        <p className="font-display text-[22px] font-bold text-ink">¿Tienes una veterinaria?</p>
+        <ul className="mt-2 space-y-1 text-[15px] text-ink">
+          {BENEFICIOS_ALIADO.map((b) => (
+            <li key={b}>{b}</li>
+          ))}
+        </ul>
+        {aliada ? (
+          <a href={aliada} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex min-h-11 items-center rounded-full bg-vino px-5 text-[15px] font-extrabold text-white">
+            Quiero ser aliada
+          </a>
+        ) : (
+          <p className="mt-4 text-[14px] text-ink-soft">Escríbenos por nuestras redes.</p>
+        )}
+      </motion.div>
+      <h3 className="font-display mt-12 text-[26px] font-bold text-ink">Distritos y serenazgo</h3>
+      <DistritosSerenazgo className="mt-4" />
+    </Seccion>
+  )
+}
+
 export function Landing({ onEntrar }: { onEntrar: () => void }) {
   const { scrollYProgress } = useScroll()
   const progreso = useSpring(scrollYProgress, { stiffness: 120, damping: 30 })
@@ -1367,7 +1465,19 @@ export function Landing({ onEntrar }: { onEntrar: () => void }) {
             <Precios onEntrar={onEntrar} />
           </Capa>
           <Capa className="bg-paper">
+            <Planes />
+          </Capa>
+          <Capa className="bg-vino">
+            <Profesionales />
+          </Capa>
+          <Capa className="bg-canvas">
+            <SiAlgoSaleMal />
+          </Capa>
+          <Capa className="bg-paper">
             <Cobertura />
+          </Capa>
+          <Capa className="bg-paper">
+            <Servicios />
           </Capa>
           <Capa className="bg-sand">
             <App />
