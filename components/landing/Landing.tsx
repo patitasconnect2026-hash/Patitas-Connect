@@ -27,9 +27,10 @@ import { COMPROBACIONES, MAX_PERROS_POR_PASEO, REGLA_NUEVO, textoHastaComprobaci
 import { cn } from '@/lib/utils'
 import { Logo, PawMark } from '../ui/Logo'
 import { StoreBadges } from '../ui/StoreBadges'
-import { Abanico, Carrusel, FranjaGigante, PestanasSubrayadas, TextoCircular, TextoRevuelto } from '../ui/Movimiento'
+import { Abanico, Carrusel, FranjaGigante, PestanasSubrayadas, TextoRevuelto } from '../ui/Movimiento'
 import { PawPattern } from '../Onboarding'
 import { Entrada } from './Entrada'
+import { Aureola } from './Aureola'
 
 /** Textos de la portada pública. Todo lo que se promete aquí existe en la app (ver la skill patitas-connect, sección 6). */
 export const TEXTO_PORTADA = {
@@ -135,150 +136,88 @@ const PORTADA: Record<
   },
 }
 
-function Aviso({ icon: Icon, t, d, className }: { icon: typeof Camera; t: string; d: string; className?: string }) {
-  return (
-    <div className={cn('absolute hidden items-center gap-3 rounded-2xl bg-paper px-3.5 py-3 shadow-pop ring-1 ring-ink/5 sm:flex', className)}>
-      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-700">
-        <Icon size={19} aria-hidden />
-      </span>
-      <span className="leading-tight">
-        <span className="block text-[14px] font-extrabold text-ink">{t}</span>
-        <span className="block text-[13px] text-ink-soft">{d}</span>
-      </span>
-    </div>
-  )
-}
-
-const POSICION_AVISOS = ['left-0 top-[12%] sm:-left-4', 'right-0 top-[46%] sm:-right-4', 'bottom-[2%] left-[6%]']
-
 function Portada({ onEntrar }: { onEntrar: () => void }) {
   const [publico, setPublico] = useState<Publico>('familia')
-  const reducir = useReducedMotion()
-  const seccion = useRef<HTMLElement>(null)
-  const { scrollYProgress: avancePortada } = useScroll({ target: seccion, offset: ['start start', 'end start'] })
-  // Parallax suave del isotipo y del círculo (capas que se mueven a distinta velocidad, como en Rainforest).
-  const yCirculo = useTransform(avancePortada, [0, 1], [0, reducir ? 0 : 60])
-  const yLogo = useTransform(avancePortada, [0, 1], [0, reducir ? 0 : -40])
-  const giro = useTransform(avancePortada, [0, 1], [0, reducir ? 0 : 8])
   const p = PORTADA[publico]
 
   return (
-    <section ref={seccion} id="inicio" className="relative scroll-mt-16 overflow-hidden px-4 pb-24 pt-8 sm:px-6 md:scroll-mt-20 md:pb-32 md:pt-14">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          backgroundImage:
-            'radial-gradient(40rem 28rem at 8% 0%, rgba(250,224,212,.95), transparent 60%), radial-gradient(36rem 30rem at 100% 100%, rgba(243,190,166,.45), transparent 60%)',
-        }}
-      />
-      <div className="relative mx-auto grid max-w-6xl items-center gap-12 md:grid-cols-[1.05fr_1fr] md:gap-8">
-        <div>
-          {/* Pestañas: cada público ve su frase y su botón. */}
-          <div role="tablist" aria-label="¿Quién eres?" className="inline-flex rounded-full bg-paper p-1 ring-1 ring-ink/10">
-            {(Object.keys(PORTADA) as Publico[]).map((k) => (
-              <button
-                key={k}
-                type="button"
-                role="tab"
-                id={`tab-${k}`}
-                aria-selected={publico === k}
-                aria-controls="portada-panel"
-                onClick={() => setPublico(k)}
-                className={cn(
-                  'relative min-h-11 rounded-full px-4 text-[14px] font-extrabold transition-colors sm:px-5 sm:text-[15px]',
-                  publico === k ? 'text-white' : 'text-ink-soft hover:text-ink',
-                )}
-              >
-                {publico === k && (
-                  <motion.span
-                    layoutId="pestana-activa"
-                    className="absolute inset-0 rounded-full bg-vino"
-                    transition={{ type: 'spring', stiffness: 400, damping: 34 }}
-                  />
-                )}
-                <span className="relative">{PORTADA[k].pestana}</span>
-              </button>
-            ))}
+    <section id="inicio" className="relative scroll-mt-16 px-3 pb-20 pt-3 sm:px-4 md:scroll-mt-20 md:pb-28 md:pt-4">
+      {/* Fondo dividido en dos paneles con fotos desenfocadas, como la referencia: claro para el texto, vino para la aureola. */}
+      <div className="relative mx-auto grid max-w-[1400px] gap-3 md:grid-cols-[1fr_1.05fr]">
+        <div className="relative overflow-hidden rounded-[2rem] px-5 py-10 sm:px-8 md:flex md:items-center md:px-12 md:py-16">
+          <div aria-hidden className="absolute inset-0">
+            <Image src="/fotos/perros/lab.jpg" alt="" fill sizes="50vw" className="scale-125 object-cover blur-2xl" />
+            <div className="absolute inset-0 bg-canvas/85" />
           </div>
+          <div className="relative">
+            {/* Pestañas: cada público ve su frase y su botón. */}
+            <div role="tablist" aria-label="¿Quién eres?" className="inline-flex rounded-full bg-paper p-1 ring-1 ring-ink/10">
+              {(Object.keys(PORTADA) as Publico[]).map((k) => (
+                <button
+                  key={k}
+                  type="button"
+                  role="tab"
+                  id={`tab-${k}`}
+                  aria-selected={publico === k}
+                  aria-controls="portada-panel"
+                  onClick={() => setPublico(k)}
+                  className={cn(
+                    'relative min-h-11 rounded-full px-4 text-[14px] font-extrabold transition-colors sm:px-5 sm:text-[15px]',
+                    publico === k ? 'text-white' : 'text-ink-soft hover:text-ink',
+                  )}
+                >
+                  {publico === k && (
+                    <motion.span
+                      layoutId="pestana-activa"
+                      className="absolute inset-0 rounded-full bg-vino"
+                      transition={{ type: 'spring', stiffness: 400, damping: 34 }}
+                    />
+                  )}
+                  <span className="relative">{PORTADA[k].pestana}</span>
+                </button>
+              ))}
+            </div>
 
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div
-              key={publico}
-              id="portada-panel"
-              role="tabpanel"
-              aria-labelledby={`tab-${publico}`}
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.25 }}
-            >
-              <h1 className="font-display mt-6 text-[38px] font-bold leading-[1.02] text-ink text-balance sm:text-[52px] lg:text-[64px]">{p.titulo}</h1>
-              <p className="mt-5 max-w-xl text-[18px] leading-relaxed text-ink-soft md:text-[20px]">{p.texto}</p>
-              <div className="mt-8">
-                {publico === 'familia' ? (
-                  <button type="button" onClick={onEntrar} className={btnPrincipal}>
-                    {TEXTO_PORTADA.reservar} <ArrowRight size={19} strokeWidth={2.6} aria-hidden />
-                  </button>
-                ) : (
-                  <Link href="/paseador" className={btnVino}>
-                    <Bike size={19} aria-hidden /> {TEXTO_PORTADA.serPaseador}
-                  </Link>
-                )}
-              </div>
-            </motion.div>
-          </AnimatePresence>
-          <p className="mt-6 inline-flex items-center gap-2 text-[14px] font-bold text-ink-soft">
-            <span className="h-2 w-2 rounded-full bg-forest" aria-hidden /> {TEXTO_PORTADA.piloto}
-          </p>
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={publico}
+                id="portada-panel"
+                role="tabpanel"
+                aria-labelledby={`tab-${publico}`}
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.25 }}
+              >
+                <h1 className="font-display mt-6 text-[38px] font-bold leading-[1.02] text-ink text-balance sm:text-[52px] lg:text-[64px]">{p.titulo}</h1>
+                <p className="mt-5 max-w-xl text-[18px] leading-relaxed text-ink-soft md:text-[20px]">{p.texto}</p>
+                <div className="mt-8">
+                  {publico === 'familia' ? (
+                    <button type="button" onClick={onEntrar} className={btnPrincipal}>
+                      {TEXTO_PORTADA.reservar} <ArrowRight size={19} strokeWidth={2.6} aria-hidden />
+                    </button>
+                  ) : (
+                    <Link href="/paseador" className={btnVino}>
+                      <Bike size={19} aria-hidden /> {TEXTO_PORTADA.serPaseador}
+                    </Link>
+                  )}
+                </div>
+              </motion.div>
+            </AnimatePresence>
+            <p className="mt-6 inline-flex items-center gap-2 text-[14px] font-bold text-ink-soft">
+              <span className="h-2 w-2 rounded-full bg-forest" aria-hidden /> {TEXTO_PORTADA.piloto}
+            </p>
+          </div>
         </div>
 
-        {/* El isotipo grande, en capas, con los avisos del público elegido. */}
-        <div className="relative mx-auto aspect-square w-full max-w-[320px] sm:max-w-[460px] md:max-w-[520px]">
-          <motion.div style={{ y: yCirculo }} className="absolute inset-[4%] overflow-hidden rounded-full bg-brand-600">
-            <PawPattern id="portada-huellas" />
-            {/* Disco que gira despacio con el nombre y los distritos (como el disco de Spaidra). */}
-            <TextoCircular texto={`${NOMBRE_APP.toUpperCase()} · SAN ISIDRO · JESÚS MARÍA · `} className="absolute inset-0 text-brand-100" />
-          </motion.div>
-          <motion.div
-            initial={{ scale: 0.85, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 180, damping: 16 }}
-            style={{ y: yLogo, rotate: giro }}
-            className="absolute inset-[15%] grid place-items-center rounded-full bg-brand-50 shadow-[0_30px_60px_-24px_rgba(91,34,41,.6)]"
-          >
-            <Image
-              src="/marca/logo-mark.png"
-              alt={`Isotipo de ${NOMBRE_APP}: un perro abrazando a su cachorro`}
-              width={482}
-              height={512}
-              priority
-              sizes="(min-width: 768px) 300px, 60vw"
-              className="h-[72%] w-auto object-contain"
-            />
-          </motion.div>
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div
-              key={publico}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
-              className="absolute inset-0"
-            >
-              {p.avisos.map((a, i) => (
-                <motion.div
-                  key={a.t}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.15 + i * 0.12 }}
-                  className="absolute inset-0"
-                >
-                  <Aviso icon={a.icon} t={a.t} d={a.d} className={POSICION_AVISOS[i]} />
-                </motion.div>
-              ))}
-            </motion.div>
-          </AnimatePresence>
+        <div className="relative overflow-hidden rounded-[2rem] px-4 py-10 sm:px-10 md:flex md:items-center md:py-14">
+          <div aria-hidden className="absolute inset-0">
+            <Image src="/fotos/perros/playa.jpg" alt="" fill sizes="50vw" className="scale-125 object-cover blur-2xl" />
+            <div className="absolute inset-0 bg-vino-900/75" />
+          </div>
+          <div className="relative w-full">
+            <Aureola avisos={p.avisos} clave={publico} />
+          </div>
         </div>
       </div>
 
@@ -1062,8 +1001,7 @@ function Pie({ onEntrar }: { onEntrar: () => void }) {
         <p>San Isidro · Jesús María · Lima, Perú</p>
       </div>
       <div className="mx-auto mt-3 max-w-6xl text-[13px] text-white/70">
-        <p>
-          Fotos de la entrada: Unsplash. No son paseos de {NOMBRE_CORTO}.</p>
+        <p>Fotos de la entrada: Unsplash. No son paseos de {NOMBRE_CORTO}.</p>
       </div>
     </footer>
   )

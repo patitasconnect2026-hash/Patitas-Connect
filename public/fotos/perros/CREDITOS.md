@@ -12,3 +12,22 @@ Se guardaron recortadas y más livianas (máximo 900 px). No son perros ni paseo
 | corriendo.jpg | Alvan Nee | https://unsplash.com/photos/T-0EW-SEbsE |
 | cachorro.jpg | Alvan Nee | https://unsplash.com/photos/eoqnr8ikwFE |
 | orejas.jpg | Pauline Loroy | https://unsplash.com/photos/U3aF7hgUSrk |
+
+## Aureola de la portada (`public/fotos/aureola/`)
+
+Recortes cuadrados de 360 px de las fotos de arriba y de estas otras, también de Unsplash:
+
+| Archivo | Autor | Foto original |
+| --- | --- | --- |
+| calle.jpg | Andriyko Podilnyk | https://unsplash.com/photos/VehdYPKnX8Y |
+| grupo.jpg | Age Cymru | https://unsplash.com/photos/XQRTTqqYjOI |
+| bosque.jpg | Martin Dalsgaard | https://unsplash.com/photos/sGV1QDMM0Gg |
+| correa.jpg | Christian Testa | https://unsplash.com/photos/kqLl6Ao7V4k |
+| abrazo.jpg | Wade Austin Ellis | https://unsplash.com/photos/FtuJIuBbUhI |
+| sendero.jpg | Julia Vivcharyk | https://unsplash.com/photos/Z-M1sKVktGM |
+| cachorro-correa.jpg | Florian Schindler | https://unsplash.com/photos/v-WVryDsM0I |
+| pradera.jpg | Patrick Hendry | https://unsplash.com/photos/d0oOCKu6n0A |
+| cuatro.jpg | Matt Nelson | https://unsplash.com/photos/aI3EBLvcyu4 |
+| negro.jpg | Brooke Balentine | https://unsplash.com/photos/U2U5o0WgB24 |
+
+Las personas de estas fotos no son paseadores de Patitas Connect.
