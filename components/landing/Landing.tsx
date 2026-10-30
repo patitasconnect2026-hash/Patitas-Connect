@@ -1,6 +1,7 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { Children, Fragment, useCallback, useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import Image from 'next/image'
 import Link from 'next/link'
 import { AnimatePresence, MotionConfig, motion, useReducedMotion, useScroll, useSpring, useTransform } from 'framer-motion'
@@ -23,11 +24,24 @@ import {
 } from 'lucide-react'
 import { CONFIG, NOMBRE_APP, NOMBRE_CORTO, TEXTOS_PAGO, textoPlanLunesViernes } from '@/lib/config'
 import { DURATIONS } from '@/lib/data'
+import { FOTOS_PERROS } from '@/lib/fotosPerros'
 import { COMPROBACIONES, MAX_PERROS_POR_PASEO, REGLA_NUEVO, textoHastaComprobaciones } from '@/lib/verificacion'
 import { cn } from '@/lib/utils'
 import { Logo, PawMark } from '../ui/Logo'
 import { StoreBadges } from '../ui/StoreBadges'
-import { Abanico, Carrusel, FranjaGigante, PestanasSubrayadas, TextoRevuelto } from '../ui/Movimiento'
+import {
+  Abanico,
+  Capa,
+  Carrusel,
+  Contador,
+  FranjaGigante,
+  HuellasFlotantes,
+  PestanasSubrayadas,
+  TextoQueSeEnciende,
+  TextoRevuelto,
+  useEntradaLateral,
+  useInclinacionPorVelocidad,
+} from '../ui/Movimiento'
 import { PawPattern } from '../Onboarding'
 import { Entrada } from './Entrada'
 import { Aureola } from './Aureola'
@@ -56,6 +70,10 @@ const btnPrincipal =
 const btnVino =
   'btn-press inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-vino px-6 text-[16px] font-extrabold text-white shadow-press-vino'
 
+/** Botón de contorno que se rellena al pasar el mouse (como «Find out more» en BAO London). */
+const btnContorno =
+  'group inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-7 text-[16px] font-extrabold ring-2 ring-white/85 transition-colors duration-300 hover:bg-white hover:text-vino focus-visible:outline-none focus-visible:ring-brand-300'
+
 const aparecer = {
   initial: { opacity: 0, y: 24 },
   whileInView: { opacity: 1, y: 0 },
@@ -79,9 +97,36 @@ function Titulo({ eyebrow, children, claro = false }: { eyebrow: string; childre
         <TextoRevuelto texto={eyebrow} />
       </p>
       <h2 className={cn('font-display mt-3 text-[32px] font-bold leading-[1.05] text-balance md:text-[46px]', claro ? 'text-white' : 'text-ink')}>
-        {children}
+        <PalabrasQueSuben>{children}</PalabrasQueSuben>
       </h2>
     </motion.div>
+  )
+}
+
+/** Las palabras del título suben una por una desde detrás de una línea (como los titulares de BAO London). */
+function PalabrasQueSuben({ children }: { children: React.ReactNode }) {
+  const partes = Children.toArray(children)
+  if (!partes.every((c) => typeof c === 'string' || typeof c === 'number')) return <>{children}</>
+  const palabras = partes.join('').split(' ').filter(Boolean)
+  return (
+    <motion.span initial="oculto" whileInView="visible" viewport={{ once: true, margin: '-40px' }} transition={{ staggerChildren: 0.07 }}>
+      {palabras.map((w, i) => (
+        <Fragment key={i}>
+          <span className="-mb-[0.14em] inline-block overflow-hidden pb-[0.14em] align-bottom">
+            <motion.span
+              variants={{
+                oculto: { y: '105%', rotate: 4 },
+                visible: { y: 0, rotate: 0 },
+              }}
+              transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              className="inline-block origin-bottom-left"
+            >
+              {w}
+            </motion.span>
+          </span>{' '}
+        </Fragment>
+      ))}
+    </motion.span>
   )
 }
 
@@ -142,7 +187,16 @@ function Portada({ onEntrar }: { onEntrar: () => void }) {
   const p = PORTADA[publico]
   // Manchas de color que flotan muy despacio en el fondo de cada panel.
   const flotar = (dx: number, dy: number, s: number) =>
-    reducir ? {} : { animate: { x: [0, dx, 0], y: [0, dy, 0] }, transition: { duration: s, repeat: Infinity, ease: 'easeInOut' as const } }
+    reducir
+      ? {}
+      : {
+          animate: { x: [0, dx, 0], y: [0, dy, 0] },
+          transition: {
+            duration: s,
+            repeat: Infinity,
+            ease: 'easeInOut' as const,
+          },
+        }
 
   return (
     <section id="inicio" className="relative scroll-mt-16 px-3 pb-20 pt-3 sm:px-4 md:scroll-mt-20 md:pb-28 md:pt-4">
@@ -182,7 +236,11 @@ function Portada({ onEntrar }: { onEntrar: () => void }) {
                       <motion.span
                         layoutId="pestana-activa"
                         className="absolute inset-0 rounded-[1.1rem] bg-[linear-gradient(135deg,#6b2a31,#4b1b21)] shadow-[0_10px_22px_-10px_rgba(46,16,20,.8)]"
-                        transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+                        transition={{
+                          type: 'spring',
+                          stiffness: 380,
+                          damping: 32,
+                        }}
                       />
                     )}
                     <span
@@ -269,6 +327,7 @@ const FRASES = [
 ]
 
 function Marquesina() {
+  const inclinar = useInclinacionPorVelocidad()
   const fila = (
     <ul className="flex shrink-0 items-center gap-8 pr-8" aria-hidden>
       {FRASES.map((f) => (
@@ -279,20 +338,124 @@ function Marquesina() {
       ))}
     </ul>
   )
+  const nombre = (
+    <ul className="flex shrink-0 items-center gap-6 pr-6" aria-hidden>
+      {Array.from({ length: 6 }, (_, i) => (
+        <li key={i} className="flex items-center gap-6 whitespace-nowrap">
+          <span className="font-display text-[15px] font-bold uppercase tracking-[0.3em]">{NOMBRE_APP}</span>
+          <span className="h-1.5 w-1.5 rounded-full bg-current" />
+        </li>
+      ))}
+    </ul>
+  )
   return (
-    <div className="overflow-hidden bg-vino py-5 text-brand-50">
+    <div className="overflow-hidden bg-vino text-brand-50">
       <p className="sr-only">{FRASES.join('. ')}.</p>
-      <div className="marquesina flex w-max">
-        {fila}
-        {fila}
+      {/* Al bajar rápido, las letras se inclinan; abajo, el nombre corre en sentido contrario. */}
+      <motion.div style={{ skewX: inclinar }} className="py-5">
+        <div className="marquesina flex w-max">
+          {fila}
+          {fila}
+        </div>
+      </motion.div>
+      <div className="border-t border-white/10 bg-brand-700 py-2.5 text-white">
+        <div className="marquesina marquesina-reversa flex w-max">
+          {nombre}
+          {nombre}
+        </div>
       </div>
     </div>
   )
 }
 
 /* ------------------------------------------------------------------ */
+/* Manifiesto: la promesa en letras grandes que se encienden al bajar, y cifras reales que cuentan */
+/* ------------------------------------------------------------------ */
+
+const MANIFIESTO = `Un vecino estudiante pasea a tu perro. Tú ves fotos con hora y lugar, entregas con un código y pagas al terminar.`
+
+function Manifiesto() {
+  const cifras = [
+    { n: 4, t: 'pasos, sin sorpresas' },
+    { n: COMPROBACIONES.length, t: 'comprobaciones posibles' },
+    { n: 2, t: 'distritos para empezar' },
+    { n: 0, t: 'soles al reservar' },
+  ]
+  return (
+    <section aria-label="Lo que hacemos" className="relative overflow-hidden bg-paper px-4 py-20 sm:px-6 md:py-32">
+      <HuellasFlotantes className="text-brand-100" />
+      <div className="relative mx-auto max-w-5xl">
+        <TextoQueSeEnciende
+          texto={MANIFIESTO}
+          resaltar={['fotos', 'código', 'terminar.']}
+          className="font-display text-[28px] font-bold leading-[1.18] text-ink sm:text-[38px] md:text-[54px]"
+        />
+        <ul className="mt-14 grid grid-cols-2 gap-x-6 gap-y-8 border-t border-ink/10 pt-10 md:grid-cols-4">
+          {cifras.map((c, i) => (
+            <motion.li key={c.t} {...aparecer} transition={{ ...aparecer.transition, delay: i * 0.1 }}>
+              <Contador hasta={c.n} className="font-display block text-[56px] font-bold leading-none text-brand-700 md:text-[72px]" />
+              <span className="mt-2 block text-[15px] font-bold text-ink-soft">{c.t}</span>
+            </motion.li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/* Ventana: una foto que se abre al bajar, con el título encima (como las fotos de BAO London) */
+/* ------------------------------------------------------------------ */
+
+function Ventana() {
+  const ref = useRef<HTMLElement>(null)
+  const reducir = useReducedMotion()
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ['start end', 'start start'],
+  })
+  const recorte = useTransform(
+    scrollYProgress,
+    [0, 1],
+    reducir ? ['inset(0% 0% round 0px)', 'inset(0% 0% round 0px)'] : ['inset(14% 22% round 48px)', 'inset(0% 0% round 0px)'],
+  )
+  const escala = useTransform(scrollYProgress, [0, 1], reducir ? [1, 1] : [1.35, 1])
+  const texto = useTransform(scrollYProgress, [0.45, 1], reducir ? [0, 0] : [60, 0])
+  return (
+    <section ref={ref} aria-labelledby="ventana-titulo" className="relative h-[88svh] min-h-[520px] overflow-hidden bg-vino-900">
+      <motion.div className="absolute inset-0 overflow-hidden" style={{ clipPath: recorte }}>
+        <motion.div className="absolute inset-0" style={{ scale: escala }}>
+          <Image src={FOTOS_PERROS.corriendo.src} alt="" fill sizes="100vw" className="object-cover" />
+        </motion.div>
+        <div aria-hidden className="absolute inset-0 bg-[linear-gradient(180deg,rgba(46,16,20,.35)_0%,rgba(46,16,20,.55)_55%,rgba(46,16,20,.8)_100%)]" />
+      </motion.div>
+      <motion.div style={{ y: texto }} className="relative flex h-full flex-col items-center justify-center px-6 text-center text-white">
+        <p className="eyebrow text-brand-200">Cada paseo</p>
+        <h2 id="ventana-titulo" className="font-display mt-4 max-w-3xl text-[40px] font-bold leading-[1.02] text-balance md:text-[76px]">
+          Cuidado de principio a fin.
+        </h2>
+        <a href="#como-funciona" className={cn(btnContorno, 'mt-9')}>
+          Ver cómo funciona <ArrowRight size={18} aria-hidden />
+        </a>
+        <p className="absolute bottom-5 text-[13px] text-white/70">Foto referencial de Unsplash.</p>
+      </motion.div>
+    </section>
+  )
+}
+
+/* ------------------------------------------------------------------ */
 /* Dos caminos: un panel para cada público (paneles altos, como Geospace) */
 /* ------------------------------------------------------------------ */
+
+/** Envuelve algo para que entre desde un lado, ligado al scroll. */
+function EntraDeLado({ lado, children }: { lado: 1 | -1; children: React.ReactNode }) {
+  const { ref, style } = useEntradaLateral<HTMLDivElement>(lado)
+  return (
+    <motion.div ref={ref} style={style}>
+      {children}
+    </motion.div>
+  )
+}
 
 function Caminos({ onEntrar }: { onEntrar: () => void }) {
   const paneles = [
@@ -332,33 +495,36 @@ function Caminos({ onEntrar }: { onEntrar: () => void }) {
     },
   ]
   return (
-    <section id="caminos" className="scroll-mt-20 bg-vino px-4 pb-16 pt-6 sm:px-6 md:pb-24">
-      <div className="mx-auto max-w-6xl">
+    <section id="caminos" className="relative scroll-mt-20 overflow-hidden bg-vino px-4 pb-16 pt-16 sm:px-6 md:pb-24 md:pt-24">
+      <HuellasFlotantes className="text-white/[0.06]" />
+      <div className="relative mx-auto max-w-6xl">
         <motion.h2 {...aparecer} className="font-display text-center text-[30px] font-bold text-white md:text-[42px]">
           ¿Quién eres?
         </motion.h2>
         <div className="mt-10 grid gap-5 md:grid-cols-2">
           {paneles.map((p, i) => (
-            <motion.article
-              key={p.id}
-              id={p.id}
-              {...aparecer}
-              transition={{ ...aparecer.transition, delay: i * 0.1 }}
-              whileHover={{ y: -6 }}
-              className={cn('group relative scroll-mt-24 overflow-hidden rounded-[2rem] p-7 text-white ring-1 ring-white/10 md:min-h-[480px] md:p-10', p.fondo)}
-            >
-              <PawMark className="absolute -bottom-10 -right-10 h-56 w-56 rotate-12 text-white/[0.07] transition-transform duration-500 group-hover:rotate-0 group-hover:scale-110" />
-              <p className="eyebrow relative text-brand-200">{p.eyebrow}</p>
-              <h3 className="font-display relative mt-3 text-[30px] font-bold leading-[1.05] md:text-[40px]">{p.titulo}</h3>
-              <ul className="relative mt-6 space-y-3">
-                {p.puntos.map((t) => (
-                  <li key={t} className="flex items-start gap-3 text-[16px] font-semibold">
-                    <Check size={20} strokeWidth={3} className="mt-0.5 shrink-0 text-brand-200" aria-hidden /> {t}
-                  </li>
-                ))}
-              </ul>
-              <div className="relative mt-8">{p.boton}</div>
-            </motion.article>
+            <EntraDeLado key={p.id} lado={i === 0 ? -1 : 1}>
+              <motion.article
+                id={p.id}
+                whileHover={{ y: -6 }}
+                className={cn(
+                  'group relative scroll-mt-24 overflow-hidden rounded-[2rem] p-7 text-white ring-1 ring-white/10 md:min-h-[480px] md:p-10',
+                  p.fondo,
+                )}
+              >
+                <PawMark className="absolute -bottom-10 -right-10 h-56 w-56 rotate-12 text-white/[0.07] transition-transform duration-500 group-hover:rotate-0 group-hover:scale-110" />
+                <p className="eyebrow relative text-brand-200">{p.eyebrow}</p>
+                <h3 className="font-display relative mt-3 text-[30px] font-bold leading-[1.05] md:text-[40px]">{p.titulo}</h3>
+                <ul className="relative mt-6 space-y-3">
+                  {p.puntos.map((t) => (
+                    <li key={t} className="flex items-start gap-3 text-[16px] font-semibold">
+                      <Check size={20} strokeWidth={3} className="mt-0.5 shrink-0 text-brand-200" aria-hidden /> {t}
+                    </li>
+                  ))}
+                </ul>
+                <div className="relative mt-8">{p.boton}</div>
+              </motion.article>
+            </EntraDeLado>
           ))}
         </div>
       </div>
@@ -395,6 +561,12 @@ const PASOS = [
 
 function ComoFunciona() {
   const [activo, setActivo] = useState(0)
+  const lista = useRef<HTMLOListElement>(null)
+  const { scrollYProgress } = useScroll({
+    target: lista,
+    offset: ['start 70%', 'end 60%'],
+  })
+  const linea = useSpring(scrollYProgress, { stiffness: 120, damping: 30 })
   return (
     <Seccion id="como-funciona" className="bg-paper">
       <div className="grid gap-10 md:grid-cols-[1fr_1.2fr] md:gap-16">
@@ -422,11 +594,18 @@ function ComoFunciona() {
             </span>
           </div>
         </div>
-        <ol className="space-y-5 md:space-y-10 md:py-10">
+        <ol ref={lista} className="relative space-y-5 pl-5 md:space-y-10 md:py-10 md:pl-8">
+          {/* La línea se llena mientras bajas por los pasos. */}
+          <span aria-hidden className="absolute bottom-0 left-0 top-0 w-1 rounded-full bg-sand md:my-10">
+            <motion.span style={{ scaleY: linea }} className="block h-full w-full origin-top rounded-full bg-brand-600" />
+          </span>
           {PASOS.map((p, i) => (
             <motion.li key={p.t} onViewportEnter={() => setActivo(i)} viewport={{ amount: 0.6 }}>
               <motion.div
-                {...aparecer}
+                initial={{ opacity: 0, x: 60, rotate: 2 }}
+                whileInView={{ opacity: 1, x: 0, rotate: 0 }}
+                viewport={{ once: true, margin: '-60px' }}
+                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
                 className={cn('rounded-3xl bg-canvas p-6 ring-1 transition-colors duration-300 md:p-8', activo === i ? 'ring-brand-300' : 'ring-ink/5')}
               >
                 <div className="flex items-center gap-4">
@@ -510,7 +689,8 @@ function Articulo({ indice, onCerrar, onSiguiente }: { indice: number; onCerrar:
     caja.current?.scrollTo({ top: 0 })
   }, [indice])
 
-  return (
+  // Va directo al <body>: las secciones se achican al bajar y eso movería un panel fijo que esté adentro.
+  return createPortal(
     <motion.div className="fixed inset-0 z-[70] flex" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
       {/* A la izquierda queda el panel elegido, como en Geospace. */}
       <button type="button" aria-label="Cerrar" tabIndex={-1} onClick={onCerrar} className={cn('hidden flex-1 md:block', h.fondo)}>
@@ -577,7 +757,8 @@ function Articulo({ indice, onCerrar, onSiguiente }: { indice: number; onCerrar:
           </button>
         </article>
       </motion.div>
-    </motion.div>
+    </motion.div>,
+    document.body,
   )
 }
 
@@ -598,8 +779,16 @@ function Tranquilidad() {
           <motion.li
             key={h.id}
             className="relative flex min-h-[260px] md:min-h-0 md:flex-1"
+            initial={{ opacity: 0, y: 80 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-40px' }}
             whileHover={{ flexGrow: 1.5 }}
-            transition={{ type: 'spring', stiffness: 200, damping: 30 }}
+            transition={{
+              type: 'spring',
+              stiffness: 200,
+              damping: 30,
+              delay: i * 0.12,
+            }}
           >
             <button
               type="button"
@@ -635,6 +824,7 @@ function Tranquilidad() {
 function Confianza() {
   return (
     <Seccion id="confianza" className="relative overflow-hidden bg-vino-800 text-white">
+      <HuellasFlotantes className="text-white/[0.05]" />
       <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
         <div>
           <Titulo eyebrow="Confianza" claro>
@@ -644,7 +834,13 @@ function Confianza() {
             Cada paseador muestra solo las comprobaciones que el equipo ya hizo. Si una no está marcada, no aparece.
           </motion.p>
         </div>
-        <motion.ul {...aparecer} className="space-y-4 lg:pt-10">
+        <motion.ul
+          initial="oculto"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-60px' }}
+          transition={{ staggerChildren: 0.12 }}
+          className="space-y-4 lg:pt-10"
+        >
           {[
             {
               icon: GraduationCap,
@@ -662,7 +858,15 @@ function Confianza() {
               d: 'Botón de ayuda para llamar a Policía, Bomberos o SAMU, y «Reportar problema» para el equipo.',
             },
           ].map((r) => (
-            <li key={r.t} className="flex items-start gap-4">
+            <motion.li
+              key={r.t}
+              variants={{
+                oculto: { opacity: 0, x: 40 },
+                visible: { opacity: 1, x: 0 },
+              }}
+              transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+              className="flex items-start gap-4"
+            >
               <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-brand-700 text-white">
                 <r.icon size={20} aria-hidden />
               </span>
@@ -670,7 +874,7 @@ function Confianza() {
                 <span className="block text-[17px] font-extrabold">{r.t}</span>
                 <span className="block text-[15px] text-white/75">{r.d}</span>
               </span>
-            </li>
+            </motion.li>
           ))}
         </motion.ul>
         <motion.div {...aparecer} className="min-w-0 lg:col-span-2">
@@ -702,8 +906,17 @@ function PawMarkIcon({ size = 20 }: { size?: number; 'aria-hidden'?: boolean }) 
 }
 
 function Precios({ onEntrar }: { onEntrar: () => void }) {
+  const ficha = useRef<HTMLDivElement>(null)
+  const reducir = useReducedMotion()
+  const { scrollYProgress } = useScroll({
+    target: ficha,
+    offset: ['start end', 'start 40%'],
+  })
+  const girarX = useTransform(scrollYProgress, [0, 1], reducir ? [0, 0] : [24, 0])
+  const subir = useTransform(scrollYProgress, [0, 1], reducir ? [0, 0] : [80, 0])
   return (
-    <Seccion id="precios" className="bg-canvas">
+    <Seccion id="precios" className="relative overflow-hidden bg-canvas">
+      <HuellasFlotantes className="text-brand-100/70" />
       <div className="grid items-start gap-12 lg:grid-cols-2">
         <div>
           <Titulo eyebrow="Precios y pago">Pagas al terminar. A {NOMBRE_CORTO}, no al paseador.</Titulo>
@@ -716,40 +929,52 @@ function Precios({ onEntrar }: { onEntrar: () => void }) {
             </button>
           </motion.div>
         </div>
-        <motion.div {...aparecer} className="overflow-hidden rounded-[2rem] bg-paper shadow-card ring-1 ring-ink/5">
-          <div className="relative overflow-hidden bg-brand-700 px-7 py-8 text-white">
-            <PawPattern id="precios-huellas" />
-            <p className="relative text-[15px] font-bold text-brand-100">Cada paseador pone su tarifa</p>
-            <p className="font-display relative mt-1 text-[44px] font-bold leading-none md:text-[56px]">
-              S/ {CONFIG.tarifaMinima} <span className="text-brand-200">a</span> {CONFIG.tarifaMaxima}
-            </p>
-            <p className="relative mt-2 text-[15px] font-semibold text-white">por hora de paseo</p>
-          </div>
-          <ul className="divide-y divide-ink/5 px-7 py-2">
-            {[
-              { t: 'Duraciones', d: `${DURATIONS.join(', ')} minutos` },
-              { t: 'Horario de recojo', d: '6:00 a. m. a 9:00 p. m.' },
-              { t: 'Plan de lunes a viernes', d: textoPlanLunesViernes() },
-              {
-                t: 'Cancelación',
-                d: `Gratis hasta ${CONFIG.horasCancelacionGratis} horas antes`,
-              },
-            ].map((r) => (
-              <li key={r.t} className="flex items-center justify-between gap-4 py-4">
-                <span className="text-[15px] font-bold text-ink">{r.t}</span>
-                <span className="text-right text-[15px] text-ink-soft">{r.d}</span>
-              </li>
-            ))}
-          </ul>
-        </motion.div>
+        <div className="[perspective:1200px]">
+          <motion.div
+            ref={ficha}
+            style={{ rotateX: girarX, y: subir }}
+            className="origin-bottom overflow-hidden rounded-[2rem] bg-paper shadow-card ring-1 ring-ink/5"
+          >
+            <div className="relative overflow-hidden bg-brand-700 px-7 py-8 text-white">
+              <PawPattern id="precios-huellas" />
+              <p className="relative text-[15px] font-bold text-brand-100">Cada paseador pone su tarifa</p>
+              <p className="font-display relative mt-1 text-[44px] font-bold leading-none md:text-[56px]">
+                S/ <Contador hasta={CONFIG.tarifaMinima} /> <span className="text-brand-200">a</span> <Contador hasta={CONFIG.tarifaMaxima} />
+              </p>
+              <p className="relative mt-2 text-[15px] font-semibold text-white">por hora de paseo</p>
+            </div>
+            <ul className="divide-y divide-ink/5 px-7 py-2">
+              {[
+                { t: 'Duraciones', d: `${DURATIONS.join(', ')} minutos` },
+                { t: 'Horario de recojo', d: '6:00 a. m. a 9:00 p. m.' },
+                { t: 'Plan de lunes a viernes', d: textoPlanLunesViernes() },
+                {
+                  t: 'Cancelación',
+                  d: `Gratis hasta ${CONFIG.horasCancelacionGratis} horas antes`,
+                },
+              ].map((r) => (
+                <li key={r.t} className="flex items-center justify-between gap-4 py-4">
+                  <span className="text-[15px] font-bold text-ink">{r.t}</span>
+                  <span className="text-right text-[15px] text-ink-soft">{r.d}</span>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+        </div>
       </div>
     </Seccion>
   )
 }
 
 const ZONAS = {
-  'san-isidro': { t: 'San Isidro', d: 'Paseadores que viven o estudian en el distrito, cerca de sus parques.' },
-  'jesus-maria': { t: 'Jesús María', d: 'Paseadores vecinos, con parques cerca de tu casa.' },
+  'san-isidro': {
+    t: 'San Isidro',
+    d: 'Paseadores que viven o estudian en el distrito, cerca de sus parques.',
+  },
+  'jesus-maria': {
+    t: 'Jesús María',
+    d: 'Paseadores vecinos, con parques cerca de tu casa.',
+  },
 } as const
 type Zona = keyof typeof ZONAS
 
@@ -769,7 +994,10 @@ function Cobertura() {
           etiqueta="Distritos"
           valor={zona}
           onCambio={setZona}
-          opciones={(Object.keys(ZONAS) as Zona[]).map((v) => ({ v, t: ZONAS[v].t }))}
+          opciones={(Object.keys(ZONAS) as Zona[]).map((v) => ({
+            v,
+            t: ZONAS[v].t,
+          }))}
         />
         <div id="zonas-panel" role="tabpanel" aria-labelledby={`zonas-tab-${zona}`} className="mt-8">
           <AnimatePresence mode="wait" initial={false}>
@@ -813,9 +1041,27 @@ const FICHAS_APP = [
     ),
   },
   ...[
-    { id: 'foto', icon: Camera, t: 'Foto del paseo', d: 'Con hora y lugar', fondo: 'bg-brand-700' },
-    { id: 'codigo', icon: KeyRound, t: 'Código de recojo', d: 'Lo das tú al entregar', fondo: 'bg-vino-800' },
-    { id: 'pago', icon: Wallet, t: 'Pagas al terminar', d: `A ${NOMBRE_CORTO}, no al paseador`, fondo: 'bg-ink' },
+    {
+      id: 'foto',
+      icon: Camera,
+      t: 'Foto del paseo',
+      d: 'Con hora y lugar',
+      fondo: 'bg-brand-700',
+    },
+    {
+      id: 'codigo',
+      icon: KeyRound,
+      t: 'Código de recojo',
+      d: 'Lo das tú al entregar',
+      fondo: 'bg-vino-800',
+    },
+    {
+      id: 'pago',
+      icon: Wallet,
+      t: 'Pagas al terminar',
+      d: `A ${NOMBRE_CORTO}, no al paseador`,
+      fondo: 'bg-ink',
+    },
   ].map((c) => ({
     id: c.id,
     contenido: (
@@ -875,12 +1121,27 @@ function QuienesSomos() {
 }
 
 function Final({ onEntrar }: { onEntrar: () => void }) {
+  const caja = useRef<HTMLDivElement>(null)
+  const reducir = useReducedMotion()
+  const { scrollYProgress } = useScroll({
+    target: caja,
+    offset: ['start end', 'center center'],
+  })
+  const escala = useTransform(scrollYProgress, [0, 1], reducir ? [1, 1] : [0.82, 1])
+  const redondeo = useTransform(scrollYProgress, [0, 1], reducir ? [40, 40] : [120, 40])
+  const giro = useTransform(scrollYProgress, [0, 1], reducir ? [0, 0] : [-180, 0])
   return (
     <Seccion className="bg-canvas pt-0 md:pt-0">
-      <motion.div {...aparecer} className="relative overflow-hidden rounded-[2.5rem] bg-vino-800 px-6 py-14 text-center text-white md:px-12 md:py-20">
+      <motion.div
+        ref={caja}
+        style={{ scale: escala, borderRadius: redondeo }}
+        className="relative overflow-hidden bg-vino-800 px-6 py-14 text-center text-white md:px-12 md:py-20"
+      >
         <PawPattern id="final-huellas" />
         <div className="relative">
-          <Image src="/marca/logo-mark.png" alt="" width={96} height={102} className="mx-auto h-24 w-auto rounded-full bg-brand-50 p-3" />
+          <motion.div style={{ rotateY: giro }} className="mx-auto w-fit">
+            <Image src="/marca/logo-mark.png" alt="" width={96} height={102} className="mx-auto h-24 w-auto rounded-full bg-brand-50 p-3" />
+          </motion.div>
           <h2 className="font-display mx-auto mt-6 max-w-2xl text-[34px] font-bold leading-[1.05] text-balance md:text-[50px]">
             Tu perro feliz, tú <span className="text-brand-300">tranquilo</span>.
           </h2>
@@ -1066,20 +1327,47 @@ export function Landing({ onEntrar }: { onEntrar: () => void }) {
             </button>
           </div>
         </header>
+        {/* Cada bloque es una «capa»: se queda quieto al terminar y el siguiente sube encima, como cartas (BAO London). */}
         <main>
-          <Entrada />
-          <Portada onEntrar={onEntrar} />
-          <Marquesina />
-          <Caminos onEntrar={onEntrar} />
-          <ComoFunciona />
-          <Tranquilidad />
-          <Confianza />
-          <Precios onEntrar={onEntrar} />
-          <Cobertura />
-          <App />
-          <QuienesSomos />
-          <Preguntas />
-          <Final onEntrar={onEntrar} />
+          <Capa primera className="bg-canvas">
+            <Entrada />
+          </Capa>
+          <Capa className="bg-canvas">
+            <Portada onEntrar={onEntrar} />
+            <Marquesina />
+          </Capa>
+          <Capa className="bg-paper">
+            <Manifiesto />
+          </Capa>
+          <Capa className="bg-vino">
+            <Caminos onEntrar={onEntrar} />
+          </Capa>
+          <Capa className="bg-vino-900">
+            <Ventana />
+          </Capa>
+          <Capa className="bg-paper">
+            <ComoFunciona />
+          </Capa>
+          <Capa className="bg-canvas">
+            <Tranquilidad />
+          </Capa>
+          <Capa className="bg-vino-800">
+            <Confianza />
+          </Capa>
+          <Capa className="bg-canvas">
+            <Precios onEntrar={onEntrar} />
+          </Capa>
+          <Capa className="bg-paper">
+            <Cobertura />
+          </Capa>
+          <Capa className="bg-sand">
+            <App />
+          </Capa>
+          <Capa ultima className="bg-canvas">
+            <QuienesSomos />
+            <Preguntas />
+            <Final onEntrar={onEntrar} />
+          </Capa>
         </main>
         <Pie onEntrar={onEntrar} />
       </div>

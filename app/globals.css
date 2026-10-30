@@ -227,3 +227,8 @@ button:disabled {
     animation: none;
   }
 }
+
+.marquesina-reversa {
+  animation-direction: reverse;
+  animation-duration: 55s;
+}

@@ -1,9 +1,10 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { motion, useInView, useReducedMotion, useScroll, useTransform } from 'framer-motion'
+import { animate, motion, useInView, useMotionValue, useReducedMotion, useScroll, useSpring, useTransform, useVelocity, type MotionValue } from 'framer-motion'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { PawMark } from './Logo'
 
 /* Piezas de movimiento de la portada, sacadas del video de referencia (TAG Heuer, Geospace, Good Dog, Spaidra).
    Todas respetan «reducir movimiento»: si la persona lo pidió, se ven quietas y completas. */
@@ -80,7 +81,10 @@ export function TextoCircular({ texto, className }: { texto: string; className?:
 export function FranjaGigante({ texto, className, haciaLaDerecha = false }: { texto: string; className?: string; haciaLaDerecha?: boolean }) {
   const ref = useRef<HTMLDivElement>(null)
   const reducir = useReducedMotion()
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] })
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ['start end', 'end start'],
+  })
   const desde = haciaLaDerecha ? '-30%' : '0%'
   const hasta = haciaLaDerecha ? '0%' : '-30%'
   const x = useTransform(scrollYProgress, [0, 1], reducir ? ['-15%', '-15%'] : [desde, hasta])
@@ -246,4 +250,181 @@ export function PestanasSubrayadas<T extends string>({
       ))}
     </div>
   )
+}
+
+/* ------------------------------------------------------------------ */
+/* Movimiento al bajar (como BAO London): secciones que se apilan como cartas, textos que se encienden, cifras que cuentan */
+/* ------------------------------------------------------------------ */
+
+/** Una sección que se queda quieta al terminar y deja que la siguiente pase por encima, como una carta sobre otra.
+ *  Mientras la tapan, se achica un poco y se oscurece. Con «reducir movimiento» es una sección normal. */
+export function Capa({
+  children,
+  className,
+  primera = false,
+  ultima = false,
+}: {
+  children: React.ReactNode
+  className?: string
+  primera?: boolean
+  ultima?: boolean
+}) {
+  const ref = useRef<HTMLDivElement>(null)
+  const reducir = useReducedMotion()
+  const [tope, setTope] = useState(0)
+
+  // Si la sección es más alta que la pantalla, se queda pegada recién cuando se ve su final.
+  useEffect(() => {
+    const el = ref.current
+    if (!el || reducir) return
+    const medir = () => setTope(Math.min(0, window.innerHeight - el.offsetHeight))
+    medir()
+    const obs = new ResizeObserver(medir)
+    obs.observe(el)
+    window.addEventListener('resize', medir)
+    return () => {
+      obs.disconnect()
+      window.removeEventListener('resize', medir)
+    }
+  }, [reducir])
+
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ['end end', 'end start'],
+  })
+  const escala = useTransform(scrollYProgress, [0, 1], [1, 0.9])
+  const sombra = useTransform(scrollYProgress, [0, 1], [0, 0.6])
+  const quieta = reducir || ultima
+  const redondo = !primera && 'rounded-t-[2rem] md:rounded-t-[3rem]'
+
+  return (
+    <div
+      ref={ref}
+      className={cn('relative overflow-clip bg-vino-900', redondo, !primera && '-mt-8 md:-mt-12', !primera && 'shadow-[0_-24px_48px_-24px_rgba(46,16,20,.45)]')}
+      style={quieta ? undefined : { position: 'sticky', top: tope }}
+    >
+      <motion.div style={quieta ? undefined : { scale: escala, transformOrigin: '50% 100%' }} className={cn('relative overflow-clip', redondo, className)}>
+        {children}
+        {!quieta && <motion.div aria-hidden className="pointer-events-none absolute inset-0 z-40 bg-vino-900" style={{ opacity: sombra }} />}
+      </motion.div>
+    </div>
+  )
+}
+
+function PalabraQueSeEnciende({ progreso, desde, hasta, children }: { progreso: MotionValue<number>; desde: number; hasta: number; children: string }) {
+  const opacidad = useTransform(progreso, [desde, hasta], [0.16, 1])
+  const y = useTransform(progreso, [desde, hasta], [8, 0])
+  return (
+    <>
+      <motion.span style={{ opacity: opacidad, y }} className="inline-block">
+        {children}
+      </motion.span>{' '}
+    </>
+  )
+}
+
+/** Un párrafo grande cuyas palabras se encienden una por una mientras bajas. */
+export function TextoQueSeEnciende({ texto, className, resaltar = [] }: { texto: string; className?: string; resaltar?: string[] }) {
+  const ref = useRef<HTMLParagraphElement>(null)
+  const reducir = useReducedMotion()
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ['start 85%', 'end 50%'],
+  })
+  const palabras = texto.split(' ')
+  return (
+    <p ref={ref} className={className}>
+      {reducir
+        ? texto
+        : palabras.map((p, i) => (
+            <span key={i} className={resaltar.includes(p) ? 'text-brand-600' : undefined}>
+              <PalabraQueSeEnciende progreso={scrollYProgress} desde={i / palabras.length} hasta={(i + 1) / palabras.length}>
+                {p}
+              </PalabraQueSeEnciende>
+            </span>
+          ))}
+    </p>
+  )
+}
+
+/** Un número que cuenta desde 0 cuando aparece en pantalla. Solo para cifras reales. */
+export function Contador({ hasta, className }: { hasta: number; className?: string }) {
+  const ref = useRef<HTMLSpanElement>(null)
+  const visto = useInView(ref, { once: true, margin: '-40px' })
+  const reducir = useReducedMotion()
+  const valor = useMotionValue(hasta)
+  const redondo = useTransform(valor, (v) => Math.round(v))
+  useEffect(() => {
+    if (reducir) return
+    if (!visto) {
+      valor.set(0)
+      return
+    }
+    const c = animate(valor, hasta, { duration: 1.4, ease: [0.22, 1, 0.36, 1] })
+    return () => c.stop()
+  }, [visto, reducir, hasta, valor])
+  return (
+    <motion.span ref={ref} className={cn('tabular-nums', className)}>
+      {redondo}
+    </motion.span>
+  )
+}
+
+const HUELLAS = [
+  { x: '4%', y: '12%', t: 56, v: 1.2, g: -18 },
+  { x: '88%', y: '8%', t: 40, v: 0.7, g: 22 },
+  { x: '78%', y: '62%', t: 72, v: 1.5, g: -8 },
+  { x: '12%', y: '78%', t: 44, v: 0.9, g: 30 },
+  { x: '50%', y: '92%', t: 34, v: 1.1, g: 12 },
+]
+
+function Huella({ progreso, h }: { progreso: MotionValue<number>; h: (typeof HUELLAS)[number] }) {
+  const y = useTransform(progreso, [0, 1], [h.v * 120, -h.v * 120])
+  const rotate = useTransform(progreso, [0, 1], [h.g, h.g + h.v * 40])
+  return (
+    <motion.span className="absolute" style={{ left: h.x, top: h.y, y, rotate, width: h.t, height: h.t }}>
+      <PawMark className="h-full w-full" />
+    </motion.span>
+  )
+}
+
+/** Huellas sueltas que suben a distinta velocidad al bajar (profundidad). Van detrás del texto y muy suaves. */
+export function HuellasFlotantes({ className }: { className?: string }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const reducir = useReducedMotion()
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ['start end', 'end start'],
+  })
+  return (
+    <div ref={ref} aria-hidden className={cn('pointer-events-none absolute inset-0 hidden overflow-hidden md:block', className)}>
+      {!reducir && HUELLAS.map((h, i) => <Huella key={i} progreso={scrollYProgress} h={h} />)}
+    </div>
+  )
+}
+
+/** Inclinación según la velocidad con que bajas: la marquesina se «estira» al bajar rápido. */
+export function useInclinacionPorVelocidad(max = 7) {
+  const { scrollY } = useScroll()
+  const velocidad = useSpring(useVelocity(scrollY), {
+    damping: 50,
+    stiffness: 400,
+  })
+  return useTransform(velocidad, [-2500, 0, 2500], [max, 0, -max], {
+    clamp: true,
+  })
+}
+
+/** Algo que entra desde un lado (y un poco girado) mientras su sección sube a la pantalla. */
+export function useEntradaLateral<T extends HTMLElement>(lado: 1 | -1) {
+  const ref = useRef<T>(null)
+  const reducir = useReducedMotion()
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ['start end', 'start 45%'],
+  })
+  const x = useTransform(scrollYProgress, [0, 1], reducir ? [0, 0] : [lado * 90, 0])
+  const rotate = useTransform(scrollYProgress, [0, 1], reducir ? [0, 0] : [lado * 5, 0])
+  const opacity = useTransform(scrollYProgress, [0, 0.6], reducir ? [1, 1] : [0.2, 1])
+  return { ref, style: { x, rotate, opacity } }
 }
