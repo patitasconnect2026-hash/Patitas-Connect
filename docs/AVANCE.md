@@ -1,7 +1,7 @@
 # Avance
 
 Estado del trabajo para que una sesión nueva sepa dónde vamos. **Este archivo es lo que se lee siempre**; el detalle de lo hecho está en [`HISTORIAL.md`](HISTORIAL.md) y solo se abre cuando haga falta. Se actualiza al terminar cada tarea.
-Última actualización: 30 de octubre de 2026 (pedido de Yahrod: **intro como el video de Lightspark** en `components/landing/Entrada.tsx` (fotos desenfocadas por toda la pantalla que se acomodan alrededor del nombre), **secciones como cartas sin taparse** (`Capa` ya no se pega: cada carta deja un margen abajo), **sin pantalla naranja al recargar** (`PatitasApp.tsx` muestra solo el fondo mientras carga), **textos de marketing** según el anuncio del equipo (lema `LEMA` y redes `REDES` en `lib/config.ts`, íconos en `components/ui/Redes.tsx`, en el final y el pie). Pendiente: el anuncio habla de «residentes» como paseadores y la app pide estudiantes.)
+Última actualización: 30 de octubre de 2026 (pedido de Yahrod: **solo web**. La app de familias y la de paseadores ya no se ven dentro de un celular en laptop: `PhoneFrame.tsx` es una página con barra y logo, la marca a la izquierda y la app en un panel ancho con animación de entrada. Términos en bloques compactos, en dos columnas en laptop. Alta de familia probada completa a 1440 y 390 px.)
 
 ## Cómo comprobar que nada se rompió
 

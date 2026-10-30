@@ -235,7 +235,7 @@ export function CasaSheet({
         </div>
       )}
 
-      <div className="relative mx-5 mt-3 h-[260px] overflow-hidden rounded-3xl border border-ink/10">
+      <div className="relative mx-5 mt-3 h-[200px] overflow-hidden rounded-3xl border border-ink/10 [@media(min-height:720px)]:h-[260px]">
         <div ref={ref} className="absolute inset-0" />
         <div className="pointer-events-none absolute left-2 top-2 z-[500] flex items-center gap-3 rounded-full bg-paper/95 px-3 py-1.5 text-[12px] font-bold text-ink-soft shadow">
           <span className="flex items-center gap-1">

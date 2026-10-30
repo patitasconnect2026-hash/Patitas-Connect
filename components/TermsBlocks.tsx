@@ -25,10 +25,7 @@ export function TermsBlocks({
 
   return (
     <div>
-      <p className="mb-2 rounded-2xl bg-amber-50 px-4 py-2.5 text-[14px] font-semibold leading-snug text-amber-900">
-        Borrador del piloto: todavía no lo revisa un abogado.
-      </p>
-      <div className="flex items-center justify-between rounded-2xl bg-sand px-4 py-3">
+      <div className="flex items-center justify-between rounded-2xl bg-sand px-4 py-2">
         <p className="flex items-center gap-2 text-[14px] font-extrabold text-ink">
           <ScrollText size={16} className="text-brand-700" />
           {done} de {blocks.length} aceptados
@@ -42,13 +39,13 @@ export function TermsBlocks({
         </button>
       </div>
 
-      <ul className="mt-3 space-y-2.5">
+      <ul className="mt-2.5 grid gap-2 lg:grid-cols-2">
         {blocks.map((b) => {
           const on = !!value[b.id]
           const expanded = open === b.id
           return (
             <li key={b.id} className={cn('rounded-2xl border-2 bg-paper transition-colors', on ? 'border-forest/60' : 'border-ink/10')}>
-              <div className="flex items-start gap-3 p-3.5">
+              <div className="flex items-start gap-2.5 p-2.5">
                 <button
                   type="button"
                   role="checkbox"
@@ -68,15 +65,15 @@ export function TermsBlocks({
                   </span>
                 </button>
                 <div className="min-w-0 flex-1">
-                  <p className="text-[14px] font-extrabold leading-snug text-ink">{b.title}</p>
-                  <p className="mt-1 text-[14px] leading-snug text-ink-soft">{b.summary}</p>
+                  <p className="pt-1 text-[14px] font-extrabold leading-snug text-ink">{b.title}</p>
+                  <p className="mt-0.5 text-[13px] leading-snug text-ink-soft">{b.summary}</p>
                   <button
                     type="button"
                     onClick={() => setOpen(expanded ? null : b.id)}
                     aria-expanded={expanded}
-                    className="min-h-11 mt-2 flex items-center gap-1 text-[14px] font-extrabold text-brand-700"
+                    className="flex min-h-11 items-center gap-1 text-[13px] font-extrabold text-brand-700"
                   >
-                    Leer el texto completo <ChevronDown size={14} className={cn('transition-transform', expanded && 'rotate-180')} />
+                    {expanded ? 'Ocultar' : 'Ver completo'} <ChevronDown size={14} className={cn('transition-transform', expanded && 'rotate-180')} />
                   </button>
                 </div>
               </div>
@@ -86,7 +83,7 @@ export function TermsBlocks({
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    className="overflow-hidden border-t border-ink/10 px-4 text-[12.5px] leading-relaxed text-ink-soft"
+                    className="overflow-hidden border-t border-ink/10 px-4 text-[13px] leading-relaxed text-ink-soft"
                   >
                     <span className="block py-3">{b.full}</span>
                   </motion.p>
@@ -96,9 +93,7 @@ export function TermsBlocks({
           )
         })}
       </ul>
-      <p className="mt-3 rounded-xl bg-amber-50 px-3 py-2 text-[12px] leading-snug text-amber-900">
-        Borrador de demostración: un abogado debe revisar estos textos antes de usarlos con personas reales.
-      </p>
+      <p className="mt-2.5 rounded-xl bg-amber-50 px-3 py-2 text-[13px] leading-snug text-amber-900">Borrador del piloto: falta que lo revise un abogado.</p>
     </div>
   )
 }
