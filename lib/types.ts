@@ -114,6 +114,12 @@ export interface Dog {
   notes: string
   medical: string
   vet: string
+  /** Cuidado especial (lib/cuidadoEspecial.ts): condiciones que marcó la familia. Fichas viejas no lo traen. */
+  condiciones?: string[]
+  /** Cómo es el perro según la familia, en barras de 0 a 100 (lib/calificacionDetallada.ts). */
+  atributos?: Record<string, number>
+  /** Hasta cuántos soles autoriza la familia en una emergencia veterinaria si no contesta (0 = me llaman primero). */
+  topeVet?: number
 }
 
 export interface Account {

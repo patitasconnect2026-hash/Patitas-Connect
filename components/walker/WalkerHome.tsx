@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
+  Bell,
   Camera,
   Check,
   Clock,
@@ -75,6 +76,10 @@ import { VerMas } from '../ui/VerMas'
 import { EtiquetaEjemplo } from '../ui/EtiquetaEjemplo'
 import { Logo } from '../ui/Logo'
 import { ProfileBuilder } from './ProfileBuilder'
+import { CalificarPorPartes } from '../funciones/CalificarPorPartes'
+import { CentroAvisosSheet } from '../funciones/CentroAvisos'
+import { ChecklistSalida } from '../funciones/ChecklistSalida'
+import { MiNivel } from '../funciones/MiNivel'
 
 type Tab = 'hoy' | 'perfil' | 'verificacion'
 
@@ -100,6 +105,7 @@ function TodayTab({
   onOpenSos,
   onReportar,
   onIrAPerfil,
+  onCalificar,
   unread,
 }: {
   app: WalkerApplication
@@ -109,6 +115,8 @@ function TodayTab({
   onReportar: (motivo?: MotivoReporte) => void
   /** Lleva a «Mi perfil» (para registrar dónde cobra). */
   onIrAPerfil: () => void
+  /** Abre «Calificar a {perro} y a la familia» (la hoja vive en la raíz: el paseo se cierra al tocar «Listo»). */
+  onCalificar: (j: Job) => void
   unread: number
 }) {
   const [encargo, setJob] = usePaseoActivo()
@@ -507,6 +515,7 @@ function TodayTab({
               <p role="status" className="rounded-2xl bg-sand p-3 text-[14px] font-semibold leading-snug text-ink">
                 <b>{textoPago.titulo}.</b> {textoPago.apoyo}
               </p>
+              <ChecklistSalida />
               <button type="button" onClick={() => mover('salir')} className={cn(btnPrimary, 'h-14 w-full text-[16px]')}>
                 <Navigation size={19} /> Voy en camino
               </button>
@@ -695,6 +704,9 @@ function TodayTab({
               <Wallet size={30} className="mx-auto" />
               <p className="mt-1.5 font-display text-[26px] font-bold leading-tight">Paseo cerrado</p>
               <p className="mt-1 text-[14px] text-white/80">{TEXTOS_PAGO.honestidadPaseador}</p>
+              <button type="button" onClick={() => onCalificar(job)} className="mt-4 min-h-12 w-full rounded-full bg-white/15 px-4 text-[14.5px] font-extrabold text-white ring-1 ring-white/40 active:scale-[0.98]">
+                Calificar a {job.dog.name} y a la familia
+              </button>
               {pagoVisto ? (
                 <button type="button" onClick={closeJob} className="mt-4 h-12 w-full rounded-full bg-white text-[14.5px] font-extrabold text-forest active:scale-[0.98]">
                   Listo
@@ -815,6 +827,8 @@ function VerificationTab({ app, walkerId, demo }: { app: WalkerApplication; walk
         ))}
       </ul>
 
+      <MiNivel paseos={paseosTotales} walkerId={walkerId} nombre={app.person.firstName} />
+
       <AperturasDelDni conServidor={conServidor} views={views} />
     </div>
   )
@@ -848,6 +862,8 @@ export function WalkerHome({
   const [confirmDel, setConfirmDel] = useState(false)
   const [sosOpen, setSosOpen] = useState(false)
   const [reportar, setReportar] = useState<{ motivo?: MotivoReporte } | null>(null)
+  const [calificar, setCalificar] = useState<Job | null>(null)
+  const [avisosOpen, setAvisosOpen] = useState(false)
   const abrirCaso = useAbrirCaso()
   const [pagosLibro] = usePagos()
   /** «Enviar reporte»: el paseo pasa a «en disputa» y el caso entra a la cola del equipo (/admin). */
@@ -929,6 +945,7 @@ export function WalkerHome({
             onOpenSos={() => setSosOpen(true)}
             onReportar={(motivo) => setReportar({ motivo })}
             onIrAPerfil={() => setTab('perfil')}
+            onCalificar={setCalificar}
             unread={unread}
           />
         </div>
@@ -946,6 +963,9 @@ export function WalkerHome({
               onChange={(v) => onChange((a) => ({ ...a, profile: { ...a.profile, disponible: v } }))}
             />
             <ProfileBuilder app={app} onChange={onChange} />
+            <button type="button" onClick={() => setAvisosOpen(true)} className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full border border-ink/15 text-[14px] font-extrabold text-ink active:scale-[0.98]">
+              <Bell size={16} /> Avisos
+            </button>
             <div className="space-y-2.5 border-t border-ink/10 pt-5">
               {demo && (
                 <button type="button" onClick={onLogout} className="flex h-12 w-full items-center justify-center gap-2 rounded-full border border-ink/15 text-[14px] font-extrabold text-ink active:scale-[0.98]">
@@ -1032,6 +1052,23 @@ export function WalkerHome({
           />
         )}
       </AnimatePresence>
+
+      <AnimatePresence>
+        {calificar && (
+          <CalificarPorPartes
+            key="calificar"
+            quien="paseador"
+            paseoId={calificar.id}
+            paseadorId={walkerId}
+            perro={calificar.dog.name}
+            paseador={app.person.firstName}
+            fichaPerro={calificar.dog.atributos}
+            onClose={() => setCalificar(null)}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>{avisosOpen && <CentroAvisosSheet key="avisos" quien="paseador" onClose={() => setAvisosOpen(false)} />}</AnimatePresence>
 
       <AnimatePresence>
         {reportar && job && <ReportarSheet key="reportar" quien="paseador" motivoInicial={reportar.motivo} onSend={enviarReporte} onClose={() => setReportar(null)} />}

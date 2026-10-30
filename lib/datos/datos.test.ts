@@ -39,6 +39,9 @@ describe('claves: no cambian (los celulares de prueba conservan sus datos)', () 
       ejemplos: 'patitas:ejemplos',
       postulacion: 'patitas:walker:v1',
       demo: 'patitas:walker:demo',
+      calificaciones: 'patitas:v1:calificaciones-detalladas',
+      avisosPreferencias: 'patitas:v1:avisos-preferencias',
+      academia: 'patitas:v1:academia-hecha',
     })
   })
 })

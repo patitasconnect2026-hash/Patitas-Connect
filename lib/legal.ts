@@ -25,7 +25,7 @@ import { CONFIG, NOMBRE_APP, NOMBRE_CORTO } from './config'
 import { COMPROBACIONES, MAX_PERROS_POR_PASEO, REGLA_NUEVO } from './verificacion'
 
 /** Cambia cada vez que cambia el texto: quien aceptó una versión vieja vuelve a aceptar. */
-export const TERMS_VERSION = '2026-10-v4'
+export const TERMS_VERSION = '2026-10-v5'
 
 export interface TermsBlock {
   id: string
@@ -97,7 +97,7 @@ export const CLIENT_BLOCKS: TermsBlock[] = [
     id: 'riesgo',
     title: 'Entiendo que pasear perros tiene riesgos',
     summary: 'Los paseadores son personas independientes y ningún paseo está libre de riesgos.',
-    full: `Pasear perros siempre tiene riesgos propios de la actividad con animales. Mostramos las comprobaciones que el equipo hizo de cada paseador y limitamos el tamaño del grupo, pero no podemos evitar que a veces pase algo. El paseador es una persona independiente: ${NOMBRE_APP} no es su empleador ni el paseador. Si ocurre un incidente, usa SOS y «Reportar problema»; el equipo lo revisa a mano. Hoy no existe ninguna póliza ni cobertura económica.`,
+    full: `Pasear perros siempre tiene riesgos propios de la actividad con animales. Mostramos las comprobaciones que el equipo hizo de cada paseador y limitamos el tamaño del grupo, pero no podemos evitar que a veces pase algo. El paseador es una persona independiente: ${NOMBRE_APP} no es su empleador ni el paseador. Si ocurre un incidente, usa SOS y «Reportar problema»; el equipo lo revisa a mano. Quién paga una atención veterinaria depende de la causa que el equipo confirme con las fotos, la ubicación y el chat del paseo: una enfermedad que tu perro ya tenía o algo que no dijiste en su ficha lo pagas tú; si el paseador rompió una regla del servicio, responde el paseador. Debes reportarlo dentro de ${CONFIG.fondoCuidado.horasParaReportar} horas, con la boleta. En la ficha de tu perro puedes dejar hasta cuánto autorizas gastar si no contestas; sin esa autorización el paseador solo lleva a tu perro a la veterinaria que indicaste y te llama. Un reporte contra un paseador debe tener sustento: dos reportes sin sustento pueden pausar tu cuenta. Hoy no existe ninguna póliza ni cobertura económica; el fondo de cuidado está en diseño y no cubre nada todavía.`,
   },
 ]
 
@@ -150,7 +150,7 @@ export const WALKER_BLOCKS: TermsBlock[] = [
     id: 'incidentes',
     title: 'Avisaré de inmediato cualquier incidente',
     summary: 'Si algo pasa, aviso al instante al equipo y al dueño, y colaboro en la revisión. Puedo ser suspendido mientras se investiga.',
-    full: `Cualquier incidente (mordida, pérdida, caída, enfermedad, pelea, accidente) se avisa de inmediato al dueño y a ${NOMBRE_CORTO}, con fotos y datos, y se reporta con «Reportar problema». Colaborarás en la revisión. Si hay una queja grave, tu cuenta puede suspenderse mientras se investiga.`,
+    full: `Cualquier incidente (mordida, pérdida, caída, enfermedad, pelea, accidente) se avisa de inmediato al dueño y a ${NOMBRE_CORTO}, con fotos y datos, y se reporta con «Reportar problema». Colaborarás en la revisión. Si hay una queja grave, tu cuenta puede suspenderse mientras se investiga. Si rompiste una regla del servicio y por eso el perro necesitó atención, respondes por ese gasto. Una queja contra ti sin sustento no te quita puntos: el equipo decide mirando las fotos de recojo y entrega, los puntos de control y el chat. Si cancelas un paseo aceptado, sumas faltas según cuánto faltaba (una emergencia con constancia no suma); con varias faltas en 30 días tu cuenta recibe un aviso, una pausa o una revisión. Si el GPS se pierde, el equipo te llama a ti y a tu contacto de emergencia; si el paseo se mueve como un vehículo, se avisa a la familia y a las autoridades.`,
   },
   {
     id: 'supervision',

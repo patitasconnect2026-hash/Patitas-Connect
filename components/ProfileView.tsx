@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Bell, Check, ChevronRight, Copy, Gift, LifeBuoy, LogOut, PawPrint, Plus, ShieldCheck, Star, Trash2, UserRound, Wallet } from 'lucide-react'
+import { Bell, Check, ChevronRight, Copy, Crown, Gift, LifeBuoy, LogOut, PawPrint, Plus, ShieldCheck, Star, Trash2, UserRound, Wallet } from 'lucide-react'
 import { CONFIG, contactoPrincipal, etiquetaAyuda, TEXTOS_PAGO } from '@/lib/config'
 import { PAST_WALKS } from '@/lib/data'
 import { SIZE_INFO } from '@/lib/schedule'
@@ -32,6 +32,8 @@ export function ProfileView({
   emergencia,
   onOpenEmergencia,
   onOpenAyuda,
+  onOpenAvisos,
+  onOpenPlanes,
   pago,
   mostrarEjemplos,
   onMostrarEjemplos,
@@ -54,6 +56,10 @@ export function ProfileView({
   emergencia: Persona | null
   onOpenEmergencia: () => void
   onOpenAyuda: () => void
+  /** Abre el centro de avisos (qué avisos llegan y cuáles se pueden apagar). */
+  onOpenAvisos?: () => void
+  /** Abre los planes y membresías. */
+  onOpenPlanes?: () => void
   /** El pago del paseo en curso (libro de pagos). null = no hay un paseo en curso. */
   pago: Pago | null
   /** «Mostrar ejemplos»: los paseos anteriores inventados solo salen si está encendido. */
@@ -235,7 +241,8 @@ export function ProfileView({
       <section className="mt-7 px-4">
         <ul className="divide-y divide-ink/10 overflow-hidden rounded-3xl border border-ink/10 bg-paper shadow-card">
           {[
-            { icon: Bell, label: 'Avisos del paseo', hint: 'Dentro de la app', onClick: undefined },
+            { icon: Bell, label: 'Avisos del paseo', hint: 'Elegir cuáles', onClick: onOpenAvisos },
+            { icon: Crown, label: 'Planes y membresías', hint: 'Gratis, Plus, Club', onClick: onOpenPlanes },
             { icon: UserRound, label: 'Contacto de emergencia', hint: emergencia ? emergencia.nombre : 'Agregar', onClick: onOpenEmergencia },
             { icon: PawPrint, label: 'Postular como paseador', hint: applied ? 'Enviada' : 'Estudiantes', onClick: onApply },
             { icon: LifeBuoy, label: etiquetaAyuda('Ayuda'), hint: contactoPrincipal() ? '' : 'Falta configurar', onClick: onOpenAyuda },

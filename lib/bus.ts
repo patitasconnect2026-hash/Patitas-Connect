@@ -34,6 +34,10 @@ export interface JobDog {
   temperament: string[]
   sociable: boolean
   vaccinated: boolean
+  /** Cómo la familia describe al perro (barras de 0 a 100): el paseador lo compara al calificar. */
+  atributos?: Record<string, number>
+  /** Cuidado especial marcado en la ficha (lib/cuidadoEspecial.ts). */
+  condiciones?: string[]
 }
 
 export interface Job {

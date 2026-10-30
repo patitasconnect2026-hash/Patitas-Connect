@@ -59,6 +59,12 @@ export const CLAVES = {
   ejemplos: 'patitas:ejemplos',
   postulacion: 'patitas:walker:v1',
   demo: 'patitas:walker:demo',
+  /** Calificaciones por barras (paseador, perro y familia) y el puntaje del 1 al 10. Solo en este teléfono por ahora. */
+  calificaciones: 'patitas:v1:calificaciones-detalladas',
+  /** Qué avisos apagó la persona (los de seguridad no se apagan). Solo en este teléfono. */
+  avisosPreferencias: 'patitas:v1:avisos-preferencias',
+  /** Cursos de la academia que el paseador marcó como hechos (simulado). */
+  academia: 'patitas:v1:academia-hecha',
 } as const
 
 /**

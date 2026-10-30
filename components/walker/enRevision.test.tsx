@@ -32,7 +32,7 @@ function completa(extra: Partial<WalkerApplication> = {}): WalkerApplication {
 
 describe('«En revisión» solo después de pasar todos los pasos y enviar', () => {
   it('la postulación de prueba está completa (si no, el resto de la prueba no dice nada)', () => {
-    expect(firstOpenStep(completa())).toBe(7)
+    expect(firstOpenStep(completa())).toBe(6)
     expect(postulacionCompleta(completa())).toBe(true)
   })
 

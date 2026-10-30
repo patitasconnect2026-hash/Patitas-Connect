@@ -59,6 +59,9 @@ import { SosSheet } from './SosSheet'
 import { QuienesSomosSheet } from './QuienesSomosSheet'
 import { SiAlgoPasaSheet } from './SiAlgoPasaSheet'
 import { ZonesMap } from './ZonesMap'
+import { CalificarPorPartes } from './funciones/CalificarPorPartes'
+import { PlanesSheet } from './funciones/Planes'
+import { CentroAvisosSheet } from './funciones/CentroAvisos'
 
 /** Qué eventos del paseo se muestran como notificación push. */
 const TOAST_TITLES: Partial<Record<EventKind, string>> = {
@@ -82,6 +85,9 @@ export function PatitasApp() {
   const [walk, setWalk] = useState<Walk | null>(null)
   const [bookingWalker, setBookingWalker] = useState<Walker | null>(null)
   const [reviewsFor, setReviewsFor] = useState<Walker | null>(null)
+  const [calificarOpen, setCalificarOpen] = useState(false)
+  const [planesOpen, setPlanesOpen] = useState(false)
+  const [avisosOpen, setAvisosOpen] = useState(false)
   const [borrarCuentaOpen, setBorrarCuentaOpen] = useState(false)
   const [dogSheet, setDogSheet] = useState<{ dog: Dog; isNew: boolean } | null>(null)
   const [profileDog, setProfileDog] = useState<{ dog: Dog; walkerView: boolean } | null>(null)
@@ -404,6 +410,8 @@ export function PatitasApp() {
         temperament: d.temperament,
         sociable: d.sociable,
         vaccinated: d.vaccinated,
+        atributos: d.atributos,
+        condiciones: d.condiciones,
       },
       slotLabel: b.slotLabel,
       durationMin: b.durationMin,
@@ -808,6 +816,8 @@ export function PatitasApp() {
         onOpenConfirm={() => setConfirmOpen(true)}
         onOpenDog={() => walk && setProfileDog({ dog: walk.booking.dog, walkerView: true })}
         onWriteReview={() => walk && setReviewsFor(walk.booking.walker)}
+        onCalificarPorPartes={() => setCalificarOpen(true)}
+        distrito={account?.district ?? null}
         onExplore={() => setTab('explore')}
         onRebook={() => walk && setBookingWalker(walk.booking.walker)}
         onDemo={startDemo}
@@ -827,6 +837,8 @@ export function PatitasApp() {
         onAddDog={openAddDog}
         onApply={goApply}
         onReset={resetDemo}
+        onOpenAvisos={() => setAvisosOpen(true)}
+        onOpenPlanes={() => setPlanesOpen(true)}
         onSalir={modoApp === 'continuar' ? () => void acceso.salir() : undefined}
         onBorrarCuenta={modoApp === 'continuar' ? () => setBorrarCuentaOpen(true) : undefined}
         emergencia={store?.emergencia ?? null}
@@ -971,6 +983,24 @@ export function PatitasApp() {
               <AnimatePresence>
                 {borrarCuentaOpen && <BorrarCuentaSheet key="borrar-cuenta" rol="familia" onBorrar={acceso.borrarCuenta} onClose={() => setBorrarCuentaOpen(false)} />}
               </AnimatePresence>
+
+              <AnimatePresence>
+                {calificarOpen && walk && (
+                  <CalificarPorPartes
+                    key="calificar"
+                    quien="familia"
+                    paseoId={walk.jobId ?? `paseo-${walk.booking.walker.id}-${walk.booking.dayIdx}-${walk.booking.startMin}`}
+                    paseadorId={walk.booking.walker.id}
+                    perroId={walk.booking.dog.id}
+                    perro={walk.booking.dog.name}
+                    paseador={walk.booking.walker.firstName}
+                    onClose={() => setCalificarOpen(false)}
+                  />
+                )}
+              </AnimatePresence>
+
+              <AnimatePresence>{planesOpen && <PlanesSheet key="planes" onClose={() => setPlanesOpen(false)} />}</AnimatePresence>
+              <AnimatePresence>{avisosOpen && <CentroAvisosSheet key="avisos" quien="familia" onClose={() => setAvisosOpen(false)} />}</AnimatePresence>
 
               <AnimatePresence>
                 {chatOpen && walk && (
