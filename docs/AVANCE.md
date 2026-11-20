@@ -186,3 +186,5 @@ Decisiones de negocio con una opción **por defecto, reversible** ya aplicada: n
 | **Detalles menores de pantalla y de texto (19)**: marcadores de parque, círculo «Paseo», nombres mezclados, frases y títulos largos | Se dejan; cada uno con su pregunta de una línea. | Ver [HISTORIAL](HISTORIAL.md#pendientes-menores). |
 
 **Otros apartados, en [`HISTORIAL.md`](HISTORIAL.md):** [Números nacionales de emergencia](HISTORIAL.md#numeros-emergencia) · [Nota de servidor](HISTORIAL.md#nota-servidor) · [Prepararse para Supabase](HISTORIAL.md#supabase) · [Hallazgos de la revisión independiente](HISTORIAL.md#hallazgos) · [Probar en un celular real (HTTPS)](HISTORIAL.md#celular-real) · [Problemas conocidos](HISTORIAL.md#problemas-conocidos) · [Simulado (no es real)](HISTORIAL.md#simulado).
+
+<!-- Prueba de conexión (rama jhuda/prueba-conexion): este comentario no se ve en la página. -->
