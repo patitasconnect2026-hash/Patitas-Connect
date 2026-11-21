@@ -56,7 +56,18 @@ function DesktopPitch({ walker }: { walker: boolean }) {
 
 /** Marco de la app de familias y de paseadores. En celular ocupa toda la pantalla; desde tablet es una página web:
  *  barra con el logo arriba, la marca a la izquierda (en laptop) y la app en un panel ancho que entra con un leve movimiento. */
-export function PhoneFrame({ children, walker = false }: { children: React.ReactNode; walker?: boolean }) {
+export function PhoneFrame({
+  children,
+  walker = false,
+  onInicio,
+}: {
+  children: React.ReactNode
+  walker?: boolean
+  /** Con sesión iniciada, «/» vuelve a abrir la app y no la portada. Si se pasa esto, «Volver al inicio» muestra la portada de verdad. */
+  onInicio?: () => void
+}) {
+  const claseVolver =
+    'inline-flex min-h-11 items-center gap-2 rounded-full bg-paper/80 px-4 text-[15px] font-extrabold text-ink ring-1 ring-ink/10 transition hover:bg-paper'
   return (
     <MotionConfig reducedMotion="user">
       <div
@@ -69,15 +80,24 @@ export function PhoneFrame({ children, walker = false }: { children: React.React
       >
         <header className="hidden border-b border-ink/5 bg-canvas/80 backdrop-blur sm:block">
           <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-6">
-            <Link href="/" aria-label="Ir al inicio" className="shrink-0">
-              <Logo size={40} />
-            </Link>
-            <Link
-              href="/"
-              className="inline-flex min-h-11 items-center gap-2 rounded-full bg-paper/80 px-4 text-[15px] font-extrabold text-ink ring-1 ring-ink/10 transition hover:bg-paper"
-            >
-              <ArrowLeft size={18} aria-hidden /> Volver al inicio
-            </Link>
+            {onInicio ? (
+              <button type="button" onClick={onInicio} aria-label="Ir al inicio" className="shrink-0">
+                <Logo size={40} />
+              </button>
+            ) : (
+              <Link href="/" aria-label="Ir al inicio" className="shrink-0">
+                <Logo size={40} />
+              </Link>
+            )}
+            {onInicio ? (
+              <button type="button" onClick={onInicio} className={claseVolver}>
+                <ArrowLeft size={18} aria-hidden /> Volver al inicio
+              </button>
+            ) : (
+              <Link href="/" className={claseVolver}>
+                <ArrowLeft size={18} aria-hidden /> Volver al inicio
+              </Link>
+            )}
           </div>
         </header>
         <div className="sm:mx-auto sm:grid sm:w-full sm:max-w-7xl sm:flex-1 sm:items-center sm:px-6 sm:py-5 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-16">

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Bell, Check, ChevronRight, Copy, Gift, LifeBuoy, LogOut, PawPrint, Plus, ShieldCheck, Star, Trash2, UserRound, Wallet } from 'lucide-react'
+import { Bell, Check, ChevronRight, Copy, Gift, Home, LifeBuoy, LogOut, PawPrint, Plus, ShieldCheck, Star, Trash2, UserRound, Wallet } from 'lucide-react'
 import { CONFIG, contactoPrincipal, etiquetaAyuda, TEXTOS_PAGO } from '@/lib/config'
 import { PAST_WALKS } from '@/lib/data'
 import { SIZE_INFO } from '@/lib/schedule'
@@ -29,6 +29,7 @@ export function ProfileView({
   onReset,
   onSalir,
   onBorrarCuenta,
+  onInicio,
   emergencia,
   onOpenEmergencia,
   onOpenAyuda,
@@ -50,6 +51,8 @@ export function ProfileView({
   onSalir?: () => void
   /** Solo con servidor y con sesión: abre «¿Borrar tu cuenta?». Sin esto no se ofrece. */
   onBorrarCuenta?: () => void
+  /** Vuelve a la portada de la marca (en el celular no hay barra de arriba con «Volver al inicio»). */
+  onInicio?: () => void
   /** Contacto de emergencia guardado (solo en este teléfono). */
   emergencia: Persona | null
   onOpenEmergencia: () => void
@@ -250,6 +253,11 @@ export function ProfileView({
             </li>
           ))}
         </ul>
+        {onInicio && (
+          <button type="button" onClick={onInicio} className="min-h-11 mx-auto mt-5 flex items-center gap-2 text-[14px] font-bold text-ink-soft underline underline-offset-4">
+            <Home size={14} /> Volver al inicio
+          </button>
+        )}
         {onSalir ? (
           <button type="button" onClick={onSalir} className="min-h-11 mx-auto mt-5 flex items-center gap-2 text-[14px] font-bold text-ink-soft underline underline-offset-4">
             <LogOut size={14} /> Salir

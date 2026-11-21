@@ -207,6 +207,8 @@ export function PatitasApp() {
   const [pedirOpen, setPedirOpen] = useState(false)
   /** La persona tocó «Entrar» en la portada pública: se muestra la app (alta o inicio de sesión). */
   const [verApp, setVerApp] = useState(false)
+  /** Con sesión iniciada: «Volver al inicio» muestra la portada de la marca; «Entrar» devuelve a la app. */
+  const [verPortada, setVerPortada] = useState(false)
   const respuestasNuevas = pedidos.pedido && pedidos.activo ? pedidos.pedido.ofertas.filter((o) => o.estado === 'enviada') : []
   useAvisoDeNuevos(respuestasNuevas.map((o) => o.id))
 
@@ -829,6 +831,7 @@ export function PatitasApp() {
         onReset={resetDemo}
         onSalir={modoApp === 'continuar' ? () => void acceso.salir() : undefined}
         onBorrarCuenta={modoApp === 'continuar' ? () => setBorrarCuentaOpen(true) : undefined}
+        onInicio={() => setVerPortada(true)}
         emergencia={store?.emergencia ?? null}
         onOpenEmergencia={() => setEmergenciaOpen(true)}
         onOpenAyuda={() => setTab('safety')}
@@ -861,9 +864,13 @@ export function PatitasApp() {
   if (desdePortada && !verApp) {
     return <Landing onEntrar={() => setVerApp(true)} />
   }
+  if (!mostrarOnboarding && verPortada) {
+    return <Landing onEntrar={() => setVerPortada(false)} />
+  }
+  const irAlInicio = !mostrarOnboarding ? () => setVerPortada(true) : undefined
 
   return (
-    <PhoneFrame>
+    <PhoneFrame onInicio={irAlInicio}>
             <>
               <AvisoDeServidor />
               <div ref={scrollRef} className="no-scrollbar relative z-0 min-h-0 flex-1 overflow-y-auto overscroll-contain">
