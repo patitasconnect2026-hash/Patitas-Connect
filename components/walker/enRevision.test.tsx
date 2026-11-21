@@ -1,6 +1,5 @@
 /**
- * La pantalla «En revisión» del paseador sale SOLO cuando la postulación pasó todos los pasos (con el curso y el
- * examen) y se envió. Sin red, sin cuentas: funciones puras y la pantalla pintada con una postulación de mentira.
+ * La pantalla «En revisión» del paseador sale SOLO cuando la postulación pasó todos los pasos (teléfono, acuerdos, datos y perfil) y se envió. Sin red, sin cuentas: funciones puras y la pantalla pintada con una postulación de mentira.
  */
 import { describe, expect, it, vi } from 'vitest'
 import { createElement } from 'react'
@@ -32,7 +31,7 @@ function completa(extra: Partial<WalkerApplication> = {}): WalkerApplication {
 
 describe('«En revisión» solo después de pasar todos los pasos y enviar', () => {
   it('la postulación de prueba está completa (si no, el resto de la prueba no dice nada)', () => {
-    expect(firstOpenStep(completa())).toBe(7)
+    expect(firstOpenStep(completa())).toBe(5)
     expect(postulacionCompleta(completa())).toBe(true)
   })
 
@@ -47,22 +46,16 @@ describe('«En revisión» solo después de pasar todos los pasos y enviar', () 
     expect(debeVerLosPasos(a)).toBe(false)
   })
 
-  it('«enviada» pero sin haber hecho el curso: vuelve a los pasos, no «En revisión»', () => {
-    const a = completa({ status: 'enviada', curso: undefined })
+  it('alta rápida: sin curso ni examen ni autorización de consultas la postulación igual está completa', () => {
+    const a = completa({ status: 'enviada', curso: undefined, quiz: undefined, consults: { consent: false } })
     expect(firstOpenStep(a)).toBe(5)
-    expect(debeVerLosPasos(a)).toBe(true)
+    expect(postulacionCompleta(a)).toBe(true)
+    expect(debeVerLosPasos(a)).toBe(false)
   })
 
-  it('«enviada» pero sin el examen, o con el examen no aprobado: vuelve a los pasos', () => {
-    expect(debeVerLosPasos(completa({ status: 'enviada', quiz: undefined }))).toBe(true)
-    const reprobado = completa({ status: 'enviada' })
-    expect(debeVerLosPasos({ ...reprobado, quiz: { ...reprobado.quiz!, verdict: 'fail' } })).toBe(true)
-  })
-
-  it('«enviada» pero con un paso anterior sin hacer (términos, datos, perfil, verificación en vivo): vuelve a ese paso', () => {
+  it('«enviada» pero con un paso anterior sin hacer (teléfono, acuerdos, datos, perfil): vuelve a ese paso', () => {
     expect(debeVerLosPasos(completa({ status: 'enviada', phone: '' }))).toBe(true)
     expect(debeVerLosPasos(completa({ status: 'enviada', consent: {} }))).toBe(true)
-    expect(debeVerLosPasos(completa({ status: 'enviada', consults: { consent: false } }))).toBe(true)
   })
 
   it('una postulación vacía (cuenta nueva) no es «enviada» ni completa', () => {

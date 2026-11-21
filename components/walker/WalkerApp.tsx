@@ -73,7 +73,7 @@ export function Welcome({ onStart, servidor = false }: { onStart: (opcion: Opcio
             { icon: Wallet, t: `${NOMBRE_CORTO} te paga después del paseo` },
             { icon: BadgeCheck, t: 'Tu DNI a la vista da confianza' },
             { icon: ShieldCheck, t: 'Te acompañamos en tu primer paseo' },
-            { icon: Clock, t: 'Postular toma unos 25 minutos' },
+            { icon: Clock, t: 'Postular toma unos 5 minutos' },
           ].map((b) => (
             <li key={b.t} className="flex items-center gap-2.5 text-[14px] font-bold">
               <b.icon size={18} className="shrink-0 text-brand-100" /> {b.t}
@@ -87,7 +87,7 @@ export function Welcome({ onStart, servidor = false }: { onStart: (opcion: Opcio
             <li>Tener 18 años o más y tu DNI</li>
             <li>Vivir o estudiar en San Isidro o Jesús María</li>
             <li>Aceptar que los clientes vean los últimos 4 dígitos de tu DNI</li>
-            <li>Una verificación en vivo con nosotros, por WhatsApp</li>
+            <li>Tu postulación queda en espera hasta que el equipo la apruebe</li>
           </ul>
           {servidor && <p className="mt-2.5 text-[14px] font-bold leading-snug">{TEXTO_PORTADA_PASEADOR.yaPostulaste}</p>}
         </div>

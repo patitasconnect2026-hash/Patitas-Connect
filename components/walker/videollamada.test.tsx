@@ -39,19 +39,18 @@ function enElPaso6(extra: Partial<WalkerApplication> = {}): WalkerApplication {
 
 const pintar = (app: WalkerApplication) => renderToStaticMarkup(createElement(WalkerOnboarding, { app, onChange: () => undefined, onSubmit: () => undefined, onExit: () => undefined }))
 
-describe('el paso de verificación en vivo: ya no se agenda un horario', () => {
-  it('la postulación llega al paso 6 y se detiene ahí hasta dar la autorización (no hace falta elegir hora)', () => {
-    expect(firstOpenStep(enElPaso6())).toBe(6)
-    expect(firstOpenStep(enElPaso6({ consults: { consent: true } }))).toBe(7)
-    expect(postulacionCompleta(enElPaso6({ consults: { consent: true } }))).toBe(true)
+describe('alta rápida: ya no hay paso de verificación en vivo', () => {
+  it('la postulación va de los datos y el perfil directo a «Revisa y envía», sin pedir autorización de consultas ni hora', () => {
+    expect(firstOpenStep(enElPaso6())).toBe(5)
+    expect(postulacionCompleta(enElPaso6())).toBe(true)
   })
 
-  it('se titula «Verificación en vivo», no pide horario y dice que se coordina por WhatsApp', () => {
+  it('«Revisa y envía» no habla de verificación en vivo ni de videollamada y dice que queda en espera', () => {
     const h = pintar(enElPaso6())
-    expect(h).toContain('Verificación en vivo')
-    expect(h).not.toContain('Elige tu horario de videollamada')
-    expect(h).not.toContain('Lun 7:00 pm')
-    expect(h).toMatch(/WhatsApp/)
+    expect(h).toContain('Revisa y envía')
+    expect(h).not.toContain('Verificación en vivo')
+    expect(h).not.toMatch(/videollamada/i)
+    expect(h).toContain('queda en espera')
   })
 
   it('NO ofrece traer ni invitar a nadie: sin referencias, invitados ni acompañantes (ni campos de nombre, relación o celular)', () => {
@@ -62,7 +61,7 @@ describe('el paso de verificación en vivo: ya no se agenda un horario', () => {
 
   it('con la autorización marcada basta para continuar: ya no hay referencias que completar o borrar', () => {
     const h = pintar(enElPaso6({ consults: { consent: true } }))
-    // Se abre en el paso 7 («Revisa y envía»): la lista no menciona referencias ni un horario de videollamada.
+    // Se abre en el paso 5 («Revisa y envía»): la lista no menciona referencias ni un horario de videollamada.
     expect(h).toContain('Revisa y envía')
     expect(h).not.toMatch(/Videollamada ·/)
     expect(h).not.toMatch(/Referencias|referencia/)

@@ -103,11 +103,10 @@ describe('appDeFilas', () => {
     for (const id of CASILLAS_DEL_EQUIPO) expect(marcas[id]).toBe(false)
   })
 
-  it('«aprobada» sin las cinco casillas se MUESTRA en revisión (estadoVisible)', () => {
+  it('alta rápida: «aprobada» se muestra aprobada aunque falten casillas (estadoVisible)', () => {
     const cuatro = { dni: true, distrito: true, celular: true, consultas: true, examen: false }
-    expect(estadoVisible(appDeFilas({ post: { ...filaBase, estado: 'supervisado' }, comp: cuatro }))).toBe('enviada')
-    expect(estadoVisible(appDeFilas({ post: { ...filaBase, estado: 'activo' }, comp: null }))).toBe('enviada')
-    expect(estadoVisible(appDeFilas({ post: { ...filaBase, estado: 'supervisado' }, comp: { ...cuatro, examen: true } }))).toBe('supervisado')
+    expect(estadoVisible(appDeFilas({ post: { ...filaBase, estado: 'supervisado' }, comp: cuatro }))).toBe('supervisado')
+    expect(estadoVisible(appDeFilas({ post: { ...filaBase, estado: 'activo' }, comp: null }))).toBe('activo')
   })
 
   it('un estado raro de la base se trata como borrador', () => {

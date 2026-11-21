@@ -191,8 +191,8 @@ export function cincoCasillasMarcadas(a: WalkerApplication): boolean {
  * Es la única regla: la app del cliente, la del paseador y /admin leen de aquí.
  */
 export function estadoVisible(a: WalkerApplication): AppStatus {
-  const aprobada = a.status === 'supervisado' || a.status === 'activo'
-  return aprobada && !cincoCasillasMarcadas(a) ? 'enviada' : a.status
+  // Alta rápida (pruebas): el estado es el que puso el equipo. Ya no se exigen las casillas de verificación.
+  return a.status
 }
 
 /**

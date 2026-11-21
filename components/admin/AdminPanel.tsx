@@ -2,21 +2,17 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { ArrowLeft, Check, Eye, EyeOff, FileCheck2, MessageCircle, Minus, Plus, ShieldCheck, ShieldX } from 'lucide-react'
-import { MAX_INTENTOS_CURSO, PASS_PCT } from '@/lib/quiz'
-import { RespuestasDelExamen } from './RespuestasDelExamen'
-import { ResumenIa } from './ResumenIa'
-import { CONFIG, NOMBRE_APP } from '@/lib/config'
-import { enlaceWhatsApp } from '@/lib/telefono'
+import { ArrowLeft, Check, Eye, EyeOff, Minus, Plus, ShieldCheck, ShieldX } from 'lucide-react'
+import { CONFIG } from '@/lib/config'
 import { useAhora, useCuentaSoloLectura, useFotosPaseo, useMostrarEjemplos, usePostulacion, usePostulacionesDelEquipo } from '@/lib/datos'
 import { TEXTO_REVISION_SERVIDOR } from '@/lib/servidor/paseosTextos'
 import { selfieDeHoy } from '@/lib/selfie'
 import { SelfieEnPaseo } from '../SelfieDelDia'
-import { ageFrom, casillasQueFaltan, type WalkerApplication, celularDeCobro, cincoCasillasMarcadas, cobroRegistrado, CONSULT_ITEMS, estadoVisible, maskDni, type AppStatus } from '@/lib/walkerStore'
+import { ageFrom, type WalkerApplication, celularDeCobro, cobroRegistrado, estadoVisible, maskDni, type AppStatus } from '@/lib/walkerStore'
 import { TEXTO_ADMIN } from '@/lib/adminTextos'
 import { cn } from '@/lib/utils'
 import { LogoMark } from '../ui/Logo'
-import { casillasMarcadas, COMPROBACIONES, llevaEtiquetaNuevo, REGLA_NUEVO, textoCantidadComprobaciones } from '@/lib/verificacion'
+import { llevaEtiquetaNuevo, REGLA_NUEVO } from '@/lib/verificacion'
 import { AvisoAdmin } from './AvisoAdmin'
 import { BotonSalir } from './BotonSalir'
 import { InterruptorEjemplos } from '../ui/InterruptorEjemplos'
@@ -31,15 +27,6 @@ const STATUS: Record<AppStatus, { label: string; tone: string }> = {
   supervisado: { label: 'Aprobado · paseos acompañados', tone: 'bg-forest-50 text-forest' },
   activo: { label: 'Activo', tone: 'bg-forest text-white' },
   rechazada: { label: 'Rechazada', tone: 'bg-red-100 text-red-700' },
-}
-
-function Check2({ on, onChange, disabled, children }: { on: boolean; onChange: (v: boolean) => void; disabled?: boolean; children: React.ReactNode }) {
-  return (
-    <label className={cn('flex items-center gap-3 rounded-2xl border p-3.5 transition', disabled ? 'cursor-default' : 'cursor-pointer', on ? 'border-forest/30 bg-forest-50' : 'border-ink/10 bg-paper')}>
-      <input type="checkbox" checked={on} disabled={disabled} onChange={(e) => onChange(e.target.checked)} className="h-5 w-5 shrink-0 accent-forest" />
-      <span className="text-[14px] font-bold text-ink">{children}</span>
-    </label>
-  )
 }
 
 /**
@@ -66,10 +53,6 @@ export function AdminPanel({ equipo }: { equipo?: { onSalir: () => Promise<void>
 
   if (!ready) return <div className="min-h-dvh bg-canvas" />
 
-  // Las seis comprobaciones (lib/verificacion.ts). La 6 se deduce de los paseos acompañados.
-  const marcadas = app ? casillasMarcadas(app.review.comprobaciones, app.review.supervisedWalks) : []
-  const cincoPrimeras = app ? cincoCasillasMarcadas(app) : false
-  // El estado que se muestra: «aprobada» solo con las casillas marcadas.
   const visible: AppStatus = app ? estadoVisible(app) : 'borrador'
 
   return (
@@ -216,80 +199,10 @@ export function AdminPanel({ equipo }: { equipo?: { onSalir: () => Promise<void>
               </div>
             </section>
 
-            {/* Mini curso (Tarea 8): se muestra al lado del examen; la casilla «Examen aprobado» la marca el equipo */}
-            <section className="rounded-3xl border border-ink/10 bg-paper p-5">
-              <h3 className="font-display text-[24px] font-bold">Mini curso</h3>
-              {app.curso ? (
-                <p className="mt-2 text-[14px] leading-snug text-ink">
-                  {app.curso.aprobado ? 'Terminó el mini curso y respondió el test' : 'Respondió el test y no alcanzó el mínimo'}: <b className="tabular-nums">{app.curso.pct} %</b> (mínimo {PASS_PCT} %) · intento{' '}
-                  {app.cursoAttempts ?? 1} de {MAX_INTENTOS_CURSO}.
-                </p>
-              ) : (
-                <p className="mt-2 rounded-2xl bg-sand p-3 text-[14px] font-semibold text-ink-soft">Todavía no lo hizo.</p>
-              )}
-              {!CONFIG.cursoRevisado && <p className="mt-2 text-[14px] font-semibold text-amber-900">{TEXTO_ADMIN.cursoSinRevisar}</p>}
-            </section>
-
-            {/* Examen: las respuestas escritas, por pregunta */}
-            <RespuestasDelExamen
-              quiz={app.quiz}
-              intento={app.quizAttempts}
-              ia={<ResumenIa paseadorId={delServidor?.id ?? null} quiz={app.quiz} persona={{ nombres: [app.person.firstName, app.person.lastName], dni: app.person.dni, telefono: app.phone }} />}
-            />
-
-            {/* Consultas en vivo, coordinadas por WhatsApp (ya no se agenda una videollamada en sala) */}
-            <section className="rounded-3xl border border-ink/10 bg-paper p-5">
-              <h3 className="font-display text-[24px] font-bold">Verificación en vivo</h3>
-              <p className="mt-1 text-[14px] text-ink-soft">Autorización de consulta: {app.consults.consent ? 'sí, otorgada' : 'no otorgada'}.</p>
-              <ul className="mt-3 space-y-2">
-                {CONSULT_ITEMS.map((c) => (
-                  <li key={c.id} className="flex items-center gap-3 rounded-2xl bg-sand px-4 py-3 text-[14px]">
-                    <FileCheck2 size={17} className="text-ink-soft" />
-                    <span className="min-w-0 flex-1">
-                      <b>{c.title}</b>
-                    </span>
-                    <a href={c.url} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center text-[14px] font-extrabold text-brand-800 underline underline-offset-2">
-                      Consultar
-                    </a>
-                  </li>
-                ))}
-              </ul>
-
-              {app.consults.consent &&
-                (() => {
-                  const enlace = app.phone
-                    ? enlaceWhatsApp(app.phone, `Hola ${app.person.firstName}, somos del equipo de ${NOMBRE_APP}. Te escribimos para coordinar la verificación en vivo de tu postulación (DNI y consultas oficiales). ¿Tienes un momento?`)
-                    : null
-                  return enlace ? (
-                    <a href={enlace} target="_blank" rel="noreferrer" className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-full bg-forest-50 px-4 py-2 text-[14px] font-extrabold text-forest active:scale-95">
-                      <MessageCircle size={16} /> Escribirle por WhatsApp para verificar
-                    </a>
-                  ) : (
-                    <p className="mt-3 text-[14px] font-semibold text-ink-soft">Sin celular válido para escribirle por WhatsApp.</p>
-                  )
-                })()}
-            </section>
-
             {/* Decisión */}
             <section className="rounded-3xl border-2 border-ink p-5">
-              <h3 className="font-display text-[24px] font-bold">{textoCantidadComprobaciones(marcadas.length)}</h3>
-              <p className="mt-1 text-[14px] text-ink-soft">Son las mismas que ven el paseador y el dueño. Solo se muestran las marcadas.</p>
-              <div className="mt-3 grid gap-2.5 sm:grid-cols-2">
-                {COMPROBACIONES.map((c) => {
-                  const derivada = c.id === 'primerPaseo'
-                  return (
-                    <Check2
-                      key={c.id}
-                      on={marcadas.includes(c.id)}
-                      disabled={derivada}
-                      onChange={(v) => update((a) => ({ ...a, review: { ...a.review, comprobaciones: { ...a.review.comprobaciones, [c.id]: v } } }))}
-                    >
-                      {c.completo}
-                      {derivada && <span className="block text-[14px] font-medium text-ink-soft">Se marca sola con el primer paseo.</span>}
-                    </Check2>
-                  )
-                })}
-              </div>
+              <h3 className="font-display text-[24px] font-bold">Decisión</h3>
+              <p className="mt-1 text-[14px] text-ink-soft">Alta rápida: no hay casillas de verificación. Revisa los datos y aprueba o rechaza.</p>
               <label className="mt-4 block">
                 <span className="eyebrow mb-1.5 block text-ink-soft">Notas internas</span>
                 <textarea
@@ -314,22 +227,17 @@ export function AdminPanel({ equipo }: { equipo?: { onSalir: () => Promise<void>
                 </div>
               </div>
 
-              {!cincoPrimeras && (
-                <p className="mt-5 text-[14px] font-semibold leading-snug text-ink-soft">{TEXTO_ADMIN.paraAprobar(casillasQueFaltan(app).map((c) => c.titulo))}</p>
-              )}
-
               <div className="mt-3 flex flex-wrap gap-3">
                 <button
                   type="button"
-                  disabled={!cincoPrimeras || app.quiz?.verdict === 'fail'}
-                  onClick={() => update((a) => ({ ...a, status: 'supervisado' }))}
+                                    onClick={() => update((a) => ({ ...a, status: 'supervisado' }))}
                   className="btn-press inline-flex h-12 items-center gap-2 rounded-full bg-forest px-6 text-[14.5px] font-extrabold text-white shadow-press-forest disabled:bg-ink/15 disabled:text-ink-soft disabled:shadow-none"
                 >
                   <ShieldCheck size={18} /> Aprobar paseos acompañados
                 </button>
                 <button
                   type="button"
-                  disabled={!cincoPrimeras || llevaEtiquetaNuevo(app.review.supervisedWalks) || app.status === 'activo'}
+                  disabled={llevaEtiquetaNuevo(app.review.supervisedWalks) || app.status === 'activo'}
                   onClick={() => update((a) => ({ ...a, status: 'activo' }))}
                   className="inline-flex h-12 items-center gap-2 rounded-full bg-ink px-6 text-[14.5px] font-extrabold text-white disabled:bg-ink/15 disabled:text-ink-soft"
                 >

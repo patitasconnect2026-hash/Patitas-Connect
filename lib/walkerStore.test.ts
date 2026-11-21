@@ -30,23 +30,19 @@ function postulacion(status: AppStatus, marcadas: readonly ComprobacionId[], pas
   }
 }
 
-describe('un paseador solo figura como aprobado si el equipo marcó las casillas', () => {
-  it('aprobado («supervisado») sin ninguna casilla: se muestra «en revisión» y no sale en la app del cliente', () => {
+describe('el estado de un paseador es el que puso el equipo (alta rápida, sin exigir casillas)', () => {
+  it('alta rápida: aprobado («supervisado») sin ninguna casilla SÍ se muestra aprobado, y sin comprobaciones', () => {
     const a = postulacion('supervisado', [])
-    expect(estadoVisible(a)).toBe('enviada')
-    expect(walkerDesdePostulacion(a)).toBeNull()
+    expect(estadoVisible(a)).toBe('supervisado')
+    const w = walkerDesdePostulacion(a)
+    expect(w).not.toBeNull()
+    expect(w?.comprobaciones).toEqual([])
   })
 
-  it('«activo» sin casillas tampoco: el estado guardado no basta', () => {
+  it('alta rápida: «activo» sin casillas también se muestra activo', () => {
     const a = postulacion('activo', [], 10)
-    expect(estadoVisible(a)).toBe('enviada')
-    expect(walkerDesdePostulacion(a)).toBeNull()
-  })
-
-  it('con cuatro de las cinco casillas sigue sin aprobarse', () => {
-    const a = postulacion('supervisado', CINCO.slice(0, 4))
-    expect(cincoCasillasMarcadas(a)).toBe(false)
-    expect(walkerDesdePostulacion(a)).toBeNull()
+    expect(estadoVisible(a)).toBe('activo')
+    expect(walkerDesdePostulacion(a)).not.toBeNull()
   })
 
   it('dice cuáles son las casillas que faltan, con su título', () => {
@@ -72,11 +68,11 @@ describe('un paseador solo figura como aprobado si el equipo marcó las casillas
     }
   })
 
-  it('si después se desmarca una casilla, deja de figurar como aprobado', () => {
+  it('alta rápida: desmarcar una casilla ya no le quita la aprobación, pero deja de mostrar esa comprobación', () => {
     const a = postulacion('supervisado', CINCO)
     const b = { ...a, review: { ...a.review, comprobaciones: { ...a.review.comprobaciones, examen: false } } }
-    expect(walkerDesdePostulacion(b)).toBeNull()
-    expect(estadoVisible(b)).toBe('enviada')
+    expect(estadoVisible(b)).toBe('supervisado')
+    expect(walkerDesdePostulacion(b)?.comprobaciones).not.toContain('examen')
   })
 
   it('un paseador de ejemplo (demostración) trae las cinco casillas y no se bloquea', () => {
